@@ -5,8 +5,6 @@ gradle/
 *.xml
 *.jar
 *.properties
-HELP.md
-.gradle
 *.docx
 build/
 !gradle/wrapper/gradle-wrapper.jar
