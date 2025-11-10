@@ -11,5 +11,6 @@ public class AttributeValue {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
+    @Column(name = "attribute_value", nullable = false)
     private String value;
 }
