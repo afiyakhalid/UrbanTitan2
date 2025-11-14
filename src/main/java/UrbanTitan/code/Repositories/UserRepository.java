@@ -1,0 +1,11 @@
+package urbantitan.code.repositories;
+
+import java.util.UUID;
+import urbantitan.code.entities.User;
+import org.springframework.stereotype.Repository;
+import org.springframework.data.jpa.repository.JpaRepository;
+
+@Repository
+public interface UserRepository extends JpaRepository<User, UUID> {
+    User findByEmail(String email);
+}

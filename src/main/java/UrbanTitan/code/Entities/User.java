@@ -1,30 +1,32 @@
-package UrbanTitan.code.Entities;
+package urbantitan.code.entities;
 
+import java.time.OffsetDateTime;
 import jakarta.persistence.*;
-
-import java.time.LocalDateTime;
+import java.util.UUID;
 
 @Entity
-@Table(name = "users")
+@Table(name = "users", uniqueConstraints = {
+    @UniqueConstraint(name = "user_email_unique", columnNames = "email")
+})
 public class User {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    @Column(nullable = false)
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    private UUID id;
+    @Column(nullable = false)
     private String name;
 
-    @Column(unique = true)
+    @Column(unique = true, nullable = false)
     private String email;
-    private String passwordHash;
-    private String phone;
+    private OffsetDateTime emailVerified;
+    private String image;
 
+    @Column(nullable = false)
+    private OffsetDateTime createdAt = OffsetDateTime.now();
+    
     @Enumerated(EnumType.STRING)
-    private Role role;
+    @Column(nullable = false)
+    private Role role = Role.CLIENT;
 
-    private LocalDateTime createdAt;
-    private LocalDateTime updatedAt;
-
-    public enum Role {
-        ADMIN, MANUFACTURER, CLIENT
-    }
+    public enum Role { ADMIN, MANUFACTURER, CLIENT }
 }
-

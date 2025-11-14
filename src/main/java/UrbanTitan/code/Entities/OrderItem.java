@@ -1,5 +1,4 @@
-package UrbanTitan.code.Entities;
-
+package urbantitan.code.entities;
 import jakarta.persistence.*;
 
 @Entity

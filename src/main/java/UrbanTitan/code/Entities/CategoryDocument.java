@@ -1,5 +1,4 @@
-package UrbanTitan.code.Entities;
-
+package urbantitan.code.entities;
 import jakarta.persistence.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
@@ -14,4 +13,3 @@ public class CategoryDocument {
     private List<CategoryDocument> subcategories;
     private LocalDateTime createdAt;
 }
-
