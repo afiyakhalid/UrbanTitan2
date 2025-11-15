@@ -5,9 +5,7 @@ import jakarta.persistence.*;
 import java.util.UUID;
 
 @Entity
-@Table(name = "users", uniqueConstraints = {
-    @UniqueConstraint(name = "user_email_unique", columnNames = "email")
-})
+@Table( name = "users" )
 public class User {
     @Id
     @Column(nullable = false)
