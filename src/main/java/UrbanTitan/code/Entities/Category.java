@@ -1,24 +1,24 @@
 package urbantitan.code.entities;
 
+import jakarta.persistence.Id;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
-import java.util.UUID;
 import jakarta.persistence.*;
 import java.time.OffsetDateTime;
-import org.hibernate.annotations.CreationTimestamp;
+import java.util.UUID;
 
 @ToString
 @Entity
 @Setter
 @Getter
 @Table( 
-    name = "brands" , 
+    name = "categories" , 
     indexes = { 
-        @Index( name = "idx_brands_slug" , columnList = "slug" ) 
+        @Index( name = "idx_categories_slug" , columnList = "slug" ) 
     }
 )
-public class Brand {
+public class Category {
     @Id
     @Column(name = "id", nullable = false)
     @GeneratedValue(strategy = GenerationType.UUID)
@@ -33,17 +33,12 @@ public class Brand {
     @Column(name = "description", nullable = false, length = 1024)
     private String description;
 
-    @Column(name = "logo_url", length = 255)
-    private String logoUrl;
+    @Column(name = "is_active")
+    private String isActive;
 
-    @Column(name = "website_url", length = 255)
-    private String websiteUrl;
-
-    @CreationTimestamp
     @Column(name = "updated_at", nullable = false)
-    private OffsetDateTime updatedAt;
+    private OffsetDateTime updatedAt = OffsetDateTime.now();
 
-    @CreationTimestamp
     @Column(name = "created_at", nullable = false, updatable = false)
-    private OffsetDateTime createdAt;
+    private OffsetDateTime createdAt = OffsetDateTime.now();
 }

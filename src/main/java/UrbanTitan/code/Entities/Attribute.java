@@ -2,23 +2,25 @@ package urbantitan.code.entities;
 
 import lombok.Getter;
 import lombok.Setter;
-import lombok.ToString;
 import java.util.UUID;
+import lombok.ToString;
 import jakarta.persistence.*;
 import java.time.OffsetDateTime;
 import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 
 @ToString
 @Entity
 @Setter
 @Getter
-@Table( 
-    name = "brands" , 
-    indexes = { 
-        @Index( name = "idx_brands_slug" , columnList = "slug" ) 
+@Table(
+    name = "attributes",
+    indexes = {
+        @Index(name = "attributesNameIdx", columnList = "name", unique = true),
+        @Index(name = "attributesSlugIdx", columnList = "slug", unique = true)
     }
 )
-public class Brand {
+public class Attribute {
     @Id
     @Column(name = "id", nullable = false)
     @GeneratedValue(strategy = GenerationType.UUID)
@@ -27,23 +29,17 @@ public class Brand {
     @Column(name = "name", nullable = false, length = 255)
     private String name;
 
-    @Column(name = "slug", nullable = false, length = 255)
+    @Column(name = "slug", nullable = false, length = 255, unique = true)
     private String slug;
 
     @Column(name = "description", nullable = false, length = 1024)
     private String description;
 
-    @Column(name = "logo_url", length = 255)
-    private String logoUrl;
-
-    @Column(name = "website_url", length = 255)
-    private String websiteUrl;
-
-    @CreationTimestamp
-    @Column(name = "updated_at", nullable = false)
-    private OffsetDateTime updatedAt;
-
     @CreationTimestamp
     @Column(name = "created_at", nullable = false, updatable = false)
     private OffsetDateTime createdAt;
+
+    @UpdateTimestamp
+    @Column(name = "updated_at", nullable = false)
+    private OffsetDateTime updatedAt;
 }

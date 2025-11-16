@@ -1,27 +1,65 @@
 package urbantitan.code.entities;
+
 import jakarta.persistence.*;
-import java.time.LocalDateTime;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
+import java.math.BigDecimal;
+import java.time.OffsetDateTime;
+import java.util.UUID;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 
+@ToString
 @Entity
-@Table(name = "product")
+@Setter
+@Getter
+@Table(
+    name = "product",
+    indexes = {
+        @Index(name = "productsSlugIdx", columnList = "slug", unique = true),
+        @Index(name = "productsBrandIdIdx", columnList = "brand_id"),
+        @Index(name = "productsCategoryIdIdx", columnList = "category_id"),
+        @Index(name = "productsIsActiveIdx", columnList = "is_active")
+    }
+)
 public class Product {
-    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    @Id
+    @Column(name = "id", nullable = false)
+    @GeneratedValue(strategy = GenerationType.UUID)
+    private UUID id;
 
+    @Column(name = "name", nullable = false, length = 255)
     private String name;
-    private Double basePrice;
-    private Integer stockQuantity;
+
+    @Column(name = "slug", nullable = false, length = 255, unique = true)
+    private String slug;
+
+    @Column(name = "description", nullable = false, length = 1024)
+    private String description;
+
+    @Column(name = "base_price", nullable = false)
+    private BigDecimal basePrice;
 
     @ManyToOne
-    @JoinColumn(name = "seller_id")
-    private Seller seller;
+    @JoinColumn(name = "brand_id", nullable = false, foreignKey = @ForeignKey(name = "fk_product_brand"))
+    private Brand brand;
 
-    // Reference to MongoDB category and metadata
-    private String mongoCategoryId;
-    private String mongoMetadataId;
+    @ManyToOne
+    @JoinColumn(name = "category_id", nullable = false, foreignKey = @ForeignKey(name = "fk_product_category"))
+    private Category category;
 
-    private Double avgRating;
-    private LocalDateTime createdAt;
-    private LocalDateTime updatedAt;
+    @Column(name = "is_active", nullable = false)
+    private Boolean isActive = true;
 
+    @Column(name = "primary_image_url")
+    private String primaryImageUrl;
+
+    @CreationTimestamp
+    @Column(name = "created_at", nullable = false, updatable = false)
+    private OffsetDateTime createdAt;
+
+    @UpdateTimestamp
+    @Column(name = "updated_at", nullable = false)
+    private OffsetDateTime updatedAt;
 }

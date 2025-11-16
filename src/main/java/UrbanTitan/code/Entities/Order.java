@@ -1,33 +1,62 @@
 package urbantitan.code.entities;
+
 import jakarta.persistence.*;
-import java.time.LocalDateTime;
-import java.util.List;
+import lombok.*;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
+import java.math.BigDecimal;
+import java.time.OffsetDateTime;
+import java.util.UUID;
 
 @Entity
-@Table(name = "orders")
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+@Table(
+    name = "orders",
+    indexes = {
+        @Index(name = "ordersUserIdx", columnList = "user_id"),
+        @Index(name = "ordersOrgIdx", columnList = "organization_id"),
+        @Index(name = "ordersContractIdx", columnList = "contract_id"),
+        @Index(name = "ordersStatusIdx", columnList = "status"),
+        @Index(name = "ordersDateIdx", columnList = "created_at")
+    }
+)
 public class Order {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
 
-    @ManyToOne @JoinColumn(name = "user_id")
+    @Id
+    @GeneratedValue(strategy = GenerationType.UUID)
+    @Column(name = "order_id", nullable = false)
+    private UUID orderId;
+
+    @Column(name = "order_number", length = 50, nullable = false, unique = true)
+    private String orderNumber;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", nullable = false,
+        foreignKey = @ForeignKey(name = "fk_order_user"))
     private User user;
 
-    private Double totalAmount;
+    @Column(name = "total_amount", precision = 10, scale = 2, nullable = false)
+    private BigDecimal totalAmount;
 
-    @Enumerated(EnumType.STRING)
-    private PaymentStatus paymentStatus;
+    @Builder.Default
+    @Column(name = "status", length = 20, nullable = false)
+    private String status = "pending"; // pending, processing, shipped, delivered, cancelled
 
-    @Enumerated(EnumType.STRING)
-    private OrderStatus orderStatus;
+    @Column(name = "shipping_address", columnDefinition = "TEXT")
+    private String shippingAddress;
 
-    private LocalDateTime createdAt;
-    private LocalDateTime updatedAt;
+    @Column(name = "billing_address", columnDefinition = "TEXT")
+    private String billingAddress;
 
-    @OneToMany(mappedBy = "order", cascade = CascadeType.ALL)
-    private List<OrderItem> orderItems;
+    @CreationTimestamp
+    @Column(name = "created_at", nullable = false, updatable = false)
+    private OffsetDateTime createdAt;
 
-    public enum PaymentStatus { PENDING, PAID, FAILED, REFUNDED }
-    public enum OrderStatus { PLACED, SHIPPED, DELIVERED, CANCELLED }
+    @UpdateTimestamp
+    @Column(name = "updated_at", nullable = false)
+    private OffsetDateTime updatedAt;
 }
-
