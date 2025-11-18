@@ -17,22 +17,22 @@ import java.util.List;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/api")
+@RequestMapping("/api/users")
 @RequiredArgsConstructor
 public class UserController {
     private final UserService userService;
     
-    @GetMapping("/users")
+    @GetMapping("/")
     public ResponseEntity<List<UserResponseDTO>> getAllUsers() {
         return ResponseEntity.status(HttpStatus.OK).body(userService.getAllUsers());
     }
 
-    @GetMapping("/users/{id}")
+    @GetMapping("/{id}")
     public ResponseEntity<UserResponseDTO> getUserById(@PathVariable UUID id) {
         return ResponseEntity.status(HttpStatus.OK).body(userService.getUserById(id));
     }
 
-    @PostMapping("/users")
+    @PostMapping("/")
     public ResponseEntity<UserResponseDTO> createUser(@RequestBody UserRequestDTO userRequest) {
         return ResponseEntity.status(HttpStatus.CREATED).body(userService.createUser(userRequest));
     }
