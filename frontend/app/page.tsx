@@ -2,7 +2,7 @@ import { Categories } from "@/components/categories";
 import { Brands } from "@/components/brands";
 import { Hero } from "@/components/hero";
 import { Products } from "@/components/products";
-import { Compare } from "@/components/compare";
+import { TopShelf } from "@/components/top-pics";
 import { FeatureHighlights } from "@/components/features";
 
 export default function Home() {
@@ -12,7 +12,7 @@ export default function Home() {
       <Categories />
       <Products />
       <Brands />
-      <Compare />
+      <TopShelf />
       <FeatureHighlights />
     </main>
   );

@@ -1,5 +1,6 @@
 "use client";
 
+import { productData, type Product as ProductType } from "@/lib/data";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import React from "react";
 
@@ -11,64 +12,37 @@ interface Article {
 }
 
 // --- Sample Data ---
-const articlesData: Article[] = [
-  {
-    category: "Electronics",
-    title: "Bajaj CUB LED Street Light 25W",
-    imageUrl:
-      "https://cdn-media.buildersmart.in/media/catalog/product/cache/1/image/9df78eab33525d08d6e5fb8d27136e95/c/u/cub_led_street_light-bajaj_2.jpg",
-    href: "/",
-  },
-  {
-    category: "Electronics",
-    title: "Philips Master LED Bulb",
-    imageUrl:
-      "https://cdn-media.buildersmart.in/media/catalog/product/cache/1/image/9df78eab33525d08d6e5fb8d27136e95/1/8/18w.jpg",
-    href: "/article/dessert-bodycare",
-  },
-  {
-    category: "Paints",
-    title: "Dulux ICI Duwel Acrylic Wall Putty - 5 Kg",
-    imageUrl:
-      "https://cdn-media.buildersmart.in/media/catalog/product/cache/1/image/9df78eab33525d08d6e5fb8d27136e95/p/f/pfwcptdlx0108.jpg",
-    href: "/category/",
-  },
-  {
-    category: "Paints",
-    title: "Dulux Dulux Smoothover - Putty - 4 Ltr",
-    imageUrl:
-      "https://cdn-media.buildersmart.in/media/catalog/product/cache/1/image/9df78eab33525d08d6e5fb8d27136e95/p/f/pfwcptdlx0105_1.jpg",
-    href: "/category/4",
-  },
-];
+const topShelfs: ProductType[] = productData.filter(
+  (p) => Number(p.id) >= 107 && Number(p.id) <= 110
+);
 
-function ArticleCard({ article }: { article: Article }) {
+function TopShelfCard({ product }: { product: ProductType }) {
   return (
     <div className="flex-shrink-0 w-[300px] md:w-[350px] bg-white rounded-lg overflow-hidden border border-gray-100 shadow-xs group">
       <div className="w-full h-[300px] relative overflow-hidden">
         <img
-          src={article.imageUrl}
-          alt={article.title}
+          src={product.images[0]}
+          alt={product.details.name}
           className="w-full h-full object-contain"
         />
       </div>
 
       <div className="p-3 space-y-2 border-t border-gray-100">
-        <p className="text-xs font-semibold tracking-widest uppercase text-gray-500 mb-2">
-          {article.category}
+        <p className="text-xs font-semibold tracking-widest uppercase text-gray-500">
+          {product.details.category}
         </p>
 
-        <h3 className="text-xl font-normal leading-snug text-gray-900 mb-4 line-clamp-1">
-          {article.title}
+        <h3 className="text-xl font-normal leading-snug text-gray-900 mb-3 line-clamp-1">
+          {product.details.name}
         </h3>
 
         <a
-          href={article.href}
+          href={`/products/${product.id}`}
           className="inline-flex items-center text-sm md:text-[1.02rem] font-medium text-gray-700 hover:text-red-600 transition duration-300"
         >
-          Read More
+          Quick View
           <span className="ml-1 text-base group-hover:translate-x-0.5 transition-transform duration-300 ease-in-out">
-            <ChevronRight className="w-5 h-5" />
+            <ChevronRight className="w-5 h-5s" />
           </span>
         </a>
       </div>
@@ -76,7 +50,7 @@ function ArticleCard({ article }: { article: Article }) {
   );
 }
 
-export function Compare() {
+export function TopShelf() {
   const scrollRef = React.useRef<HTMLDivElement | null>(null);
 
   const scrollNext = () => {
@@ -114,8 +88,8 @@ export function Compare() {
             ref={scrollRef}
             className="flex space-x-6 overflow-x-scroll scrollbar-hide pb-4"
           >
-            {articlesData.map((article, index) => (
-              <ArticleCard key={index} article={article} />
+            {topShelfs.map((prdt, index) => (
+              <TopShelfCard key={index} product={prdt} />
             ))}
           </div>
 
