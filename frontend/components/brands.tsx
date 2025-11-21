@@ -43,30 +43,30 @@ const brandsData: BrandItem[] = [
 
 function BrandCard({ brand }: { brand: BrandItem }) {
   return (
-    <div className="cursor-pointer w-full max-w-sm h-92 bg-white rounded-lg shadow-xs border border-gray-200 overflow-hidden group flex flex-col">
-      {/* Image */}
-      <div className="w-full h-56 md:h-64 overflow-hidden">
+    <div className="cursor-pointer w-full max-w-sm bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden group transition-all duration-300 hover:shadow-md">
+      {/* Image Section */}
+      <div className="w-full h-56 md:h-64 overflow-hidden bg-gray-50 flex items-center justify-center">
         <img
           src={brand.imageUrl}
           alt={brand.altText}
-          className="w-full h-full object-contain transform group-hover:scale-105 transition-transform duration-500 ease-in-out"
+          className="w-full h-full object-contain transform transition-all duration-500 group-hover:scale-105"
         />
       </div>
 
       {/* Content */}
-      <div className="p-3 flex flex-col flex-1 gap-3 text-left border-t border-gray-200">
-        <p className="text-lg md:text-xl font-normal text-gray-800 line-clamp-2">
+      <div className="p-3 py-4 text-left flex flex-col gap-4">
+        {/* Brand Description */}
+        <p className="text-lg font-medium text-gray-800 leading-snug line-clamp-2">
           {brand.description}
         </p>
 
+        {/* CTA Button */}
         <a
           href={brand.shopLink}
-          className="mt-auto inline-flex items-center text-red-600 font-medium text-md md:text-[1rem] hover:text-red-700 transition duration-300"
+          className="inline-flex items-center text-red-600 font-semibold text-sm md:text-[1rem] hover:text-red-700 transition-all duration-300"
         >
           Shop Now
-          <span className="text-lg group-hover:translate-x-1 transition-transform duration-300 ease-in-out">
-            <ChevronRight className="w-5 h-5" />
-          </span>
+          <ChevronRight className="w-5 h-5 ml-1 transform transition-all duration-300 group-hover:translate-x-1" />
         </a>
       </div>
     </div>
@@ -75,7 +75,7 @@ function BrandCard({ brand }: { brand: BrandItem }) {
 
 export function Brands() {
   return (
-    <section className="max-w-8xl mx-auto bg-gray-50 mt-8 py-8 px-8">
+    <section className="max-w-8xl mx-auto bg-gray-50 mt-8 py-12 pb-18 px-8">
       <h2 className="text-2xl md:text-3xl lg:text-4xl font-normal text-center text-gray-900 mb-10">
         Brands To Know
       </h2>

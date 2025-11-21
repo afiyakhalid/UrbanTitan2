@@ -1,7 +1,7 @@
 "use client";
 
 import { productData, type Product as ProductType } from "@/lib/data";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { ChevronLeft, ChevronRight, Star } from "lucide-react";
 import React from "react";
 
 interface Article {
@@ -27,10 +27,23 @@ function TopShelfCard({ product }: { product: ProductType }) {
         />
       </div>
 
-      <div className="p-3 space-y-2 border-t border-gray-100">
-        <p className="text-xs font-semibold tracking-widest uppercase text-gray-500">
-          {product.details.category}
-        </p>
+      <div className="px-3 py-4 space-y-2 border-t border-gray-100">
+        <div className="flex items-center justify-between">
+          {/* Category */}
+          <p className="text-[1rem] text-gray-500 font-medium">
+            {product.details.category
+              ? product.details.category.charAt(0).toUpperCase() +
+                product.details.category.slice(1)
+              : "General"}
+          </p>
+
+          {/* Rating in number format */}
+          <p className="flex items-center justify-center text-gray-700 text-sm font-semibold">
+            {product.details.rating.toFixed(1)}{" "}
+            <Star className="w-4 h-4 inline-flex mx-0.5 fill-yellow-500" /> /
+            5&nbsp;
+          </p>
+        </div>
 
         <h3 className="text-xl font-normal leading-snug text-gray-900 mb-3 line-clamp-1">
           {product.details.name}
