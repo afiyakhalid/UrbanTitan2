@@ -1,4 +1,5 @@
 import { type RatingBreakdownItem } from "@/lib/data";
+import { Star } from "lucide-react";
 
 export function ProductRatings({
   rating,
@@ -34,7 +35,10 @@ export function ProductRatings({
                 key={item.stars}
                 className="flex items-center text-sm text-gray-600"
               >
-                <span className="w-10">{item.stars}★</span>
+                <span className="w-10 flex items-center gap-1 text-black">
+                  {item.stars}{" "}
+                  <Star className="w-4 h-4 inline-flex text-yellow-500 fill-yellow-500" />
+                </span>
 
                 <div className="w-full bg-gray-200 h-2 rounded mx-2">
                   <div

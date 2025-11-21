@@ -4,13 +4,6 @@ import { productData, type Product as ProductType } from "@/lib/data";
 import { ChevronLeft, ChevronRight, Star } from "lucide-react";
 import React from "react";
 
-interface Article {
-  category: string;
-  title: string;
-  imageUrl: string;
-  href: string;
-}
-
 // --- Sample Data ---
 const topShelfs: ProductType[] = productData.filter(
   (p) => Number(p.id) >= 107 && Number(p.id) <= 110
@@ -40,8 +33,8 @@ function TopShelfCard({ product }: { product: ProductType }) {
           {/* Rating in number format */}
           <p className="flex items-center justify-center text-gray-700 text-sm font-semibold">
             {product.details.rating.toFixed(1)}{" "}
-            <Star className="w-4 h-4 inline-flex mx-0.5 fill-yellow-500" /> /
-            5&nbsp;
+            <Star className="w-4 h-4 inline-flex mx-0.5 fill-yellow-500 text-yellow-500" />{" "}
+            / 5&nbsp;
           </p>
         </div>
 
