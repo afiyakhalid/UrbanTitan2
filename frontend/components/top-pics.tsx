@@ -24,9 +24,9 @@ function TopShelfCard({ product }: { product: ProductType }) {
         <div className="flex items-center justify-between">
           {/* Category */}
           <p className="text-[1rem] text-gray-500 font-medium">
-            {product.details.category
-              ? product.details.category.charAt(0).toUpperCase() +
-                product.details.category.slice(1)
+            {product.details.slug
+              ? product.details.slug.charAt(0).toUpperCase() +
+                product.details.slug.slice(1)
               : "General"}
           </p>
 

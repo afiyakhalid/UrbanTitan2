@@ -1,5 +1,3 @@
-"use client";
-
 import { ProductImageGallery } from "@/components/product/product-gallery";
 import { ProductDetails } from "@/components/product/product-details";
 import { ProductRatings } from "@/components/product/product-ratings";

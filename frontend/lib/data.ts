@@ -11,7 +11,7 @@ export interface ProductDetails {
   treatsPoints: number;
   deliveryDate: string;
   sizes: string[];
-  category: string;
+  slug: string;
 }
 
 export interface RatingBreakdownItem {
@@ -42,7 +42,7 @@ export const productData: Product[] = [
       treatsPoints: 4,
       deliveryDate: "Delivered in 3–5 days",
       sizes: ["Standard"],
-      category: "cement",
+      slug: "cement",
     },
     images: [
       "https://cdn-media.buildersmart.in/media/catalog/product/cache/1/image/200x200/9df78eab33525d08d6e5fb8d27136e95/b/r/brick_image.png",
@@ -70,7 +70,7 @@ export const productData: Product[] = [
       treatsPoints: 1,
       deliveryDate: "Delivered in 3–5 days",
       sizes: ["Standard"],
-      category: "brick-block",
+      slug: "brick-block",
     },
     images: [
       "https://cdn-media.buildersmart.in/media/catalog/product/cache/1/image/9df78eab33525d08d6e5fb8d27136e95/v/i/vijayawadaredbrick_2.jpg",
@@ -98,7 +98,7 @@ export const productData: Product[] = [
       treatsPoints: 21,
       deliveryDate: "Delivered in 3–5 days",
       sizes: ["Standard"],
-      category: "cement",
+      slug: "cement",
     },
     images: [
       "https://cdn-media.buildersmart.in/media/catalog/product/cache/1/image/9df78eab33525d08d6e5fb8d27136e95/c/c/cci_opc.jpg",
@@ -126,7 +126,7 @@ export const productData: Product[] = [
       treatsPoints: 22,
       deliveryDate: "Delivered in 3–5 days",
       sizes: ["Standard"],
-      category: "cement",
+      slug: "cement",
     },
     images: [
       "https://cdn-media.buildersmart.in/media/catalog/product/cache/1/image/9df78eab33525d08d6e5fb8d27136e95/c/e/ceba1cre0002_2.png",
@@ -154,7 +154,7 @@ export const productData: Product[] = [
       treatsPoints: 2690,
       deliveryDate: "Delivered in 3–5 days",
       sizes: ["Standard"],
-      category: "steel-bar",
+      slug: "steel-bar",
     },
     images: [
       "https://cdn-media.buildersmart.in/media/catalog/product/cache/1/image/200x200/9df78eab33525d08d6e5fb8d27136e95/s/u/sugna_tmt_image_3.jpg",
@@ -182,7 +182,7 @@ export const productData: Product[] = [
       treatsPoints: 15,
       deliveryDate: "Delivered in 3–5 days",
       sizes: ["Standard"],
-      category: "cement",
+      slug: "cement",
     },
     images: [
       "https://cdn-media.buildersmart.in/media/catalog/product/cache/1/image/9df78eab33525d08d6e5fb8d27136e95/c/e/ceppcgacc0001.png",
@@ -211,7 +211,7 @@ export const productData: Product[] = [
       treatsPoints: 65,
       deliveryDate: "Delivered in 3–5 days",
       sizes: ["Standard"],
-      category: "electronics",
+      slug: "electronics",
     },
     images: [
       "https://cdn-media.buildersmart.in/media/catalog/product/cache/1/image/9df78eab33525d08d6e5fb8d27136e95/c/u/cub_led_street_light-bajaj_2.jpg",
@@ -240,7 +240,7 @@ export const productData: Product[] = [
       treatsPoints: 10,
       deliveryDate: "Delivered in 3–5 days",
       sizes: ["Standard"],
-      category: "electronics",
+      slug: "electronics",
     },
     images: [
       "https://cdn-media.buildersmart.in/media/catalog/product/cache/1/image/9df78eab33525d08d6e5fb8d27136e95/1/8/18w.jpg",
@@ -269,7 +269,7 @@ export const productData: Product[] = [
       treatsPoints: 17,
       deliveryDate: "Delivered in 3–5 days",
       sizes: ["5 Kg"],
-      category: "paint",
+      slug: "paint",
     },
     images: [
       "https://cdn-media.buildersmart.in/media/catalog/product/cache/1/image/9df78eab33525d08d6e5fb8d27136e95/p/f/pfwcptdlx0108.jpg",
@@ -298,7 +298,7 @@ export const productData: Product[] = [
       treatsPoints: 20,
       deliveryDate: "Delivered in 3–5 days",
       sizes: ["4 Ltr"],
-      category: "paint",
+      slug: "paint",
     },
     images: [
       "https://cdn-media.buildersmart.in/media/catalog/product/cache/1/image/9df78eab33525d08d6e5fb8d27136e95/p/f/pfwcptdlx0105_1.jpg",

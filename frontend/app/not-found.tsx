@@ -20,7 +20,7 @@ export default function NotFound() {
 
       <button
         onClick={() => (window.location.href = "/")}
-        className="mt-8 flex items-center gap-2 bg-red-600 text-white px-6 py-3 rounded-lg shadow hover:bg-red-700 transition"
+        className="cursor-pointer mt-8 flex items-center gap-2 bg-red-600 text-white px-6 py-3 rounded-lg shadow hover:bg-red-700 transition"
       >
         <ArrowLeft className="w-5 h-5" />
         Go Back Home
