@@ -1,5 +1,5 @@
 export interface ProductDetails {
-  brand: string;
+  brand: { name: string; slug: string };
   name: string;
   volume: string;
   productCode: string;
@@ -11,7 +11,7 @@ export interface ProductDetails {
   treatsPoints: number;
   deliveryDate: string;
   sizes: string[];
-  slug: string;
+  category: { name: string; slug: string };
 }
 
 export interface RatingBreakdownItem {
@@ -30,7 +30,10 @@ export const productData: Product[] = [
   {
     id: "101",
     details: {
-      brand: "Greenstone's",
+      brand: {
+        name: "Greenstone AAC Blocks",
+        slug: "greenstone",
+      },
       name: "Greenstone's AAC Brick - 600mmX200mmX100mm (4)",
       volume: "Standard",
       productCode: "PRD-102",
@@ -42,7 +45,10 @@ export const productData: Product[] = [
       treatsPoints: 4,
       deliveryDate: "Delivered in 3–5 days",
       sizes: ["Standard"],
-      slug: "cement",
+      category: {
+        name: "Bricks & Blocks",
+        slug: "bricks-blocks",
+      },
     },
     images: [
       "https://cdn-media.buildersmart.in/media/catalog/product/cache/1/image/200x200/9df78eab33525d08d6e5fb8d27136e95/b/r/brick_image.png",
@@ -55,10 +61,14 @@ export const productData: Product[] = [
       { stars: 1, count: 5 },
     ],
   },
+
   {
     id: "102",
     details: {
-      brand: "Local",
+      brand: {
+        name: "Local",
+        slug: "local",
+      },
       name: "Local Red Brick - 8-10 x 3.8 x 2.9",
       volume: "Standard",
       productCode: "PRD-103",
@@ -70,7 +80,10 @@ export const productData: Product[] = [
       treatsPoints: 1,
       deliveryDate: "Delivered in 3–5 days",
       sizes: ["Standard"],
-      slug: "brick-block",
+      category: {
+        name: "Bricks & Blocks",
+        slug: "bricks-blocks",
+      },
     },
     images: [
       "https://cdn-media.buildersmart.in/media/catalog/product/cache/1/image/9df78eab33525d08d6e5fb8d27136e95/v/i/vijayawadaredbrick_2.jpg",
@@ -83,10 +96,14 @@ export const productData: Product[] = [
       { stars: 1, count: 16 },
     ],
   },
+
   {
     id: "103",
     details: {
-      brand: "CCI",
+      brand: {
+        name: "CCI",
+        slug: "cci",
+      },
       name: "CCI OPC Cement",
       volume: "Standard",
       productCode: "PRD-104",
@@ -98,7 +115,10 @@ export const productData: Product[] = [
       treatsPoints: 21,
       deliveryDate: "Delivered in 3–5 days",
       sizes: ["Standard"],
-      slug: "cement",
+      category: {
+        name: "Cement",
+        slug: "cement",
+      },
     },
     images: [
       "https://cdn-media.buildersmart.in/media/catalog/product/cache/1/image/9df78eab33525d08d6e5fb8d27136e95/c/c/cci_opc.jpg",
@@ -111,10 +131,14 @@ export const productData: Product[] = [
       { stars: 1, count: 7 },
     ],
   },
+
   {
     id: "104",
     details: {
-      brand: "Birla.A1",
+      brand: {
+        name: "Birla A1 StrongCrete",
+        slug: "birla-a1-strongcrete",
+      },
       name: "Birla.A1 StrongCrete",
       volume: "Standard",
       productCode: "PRD-105",
@@ -126,7 +150,10 @@ export const productData: Product[] = [
       treatsPoints: 22,
       deliveryDate: "Delivered in 3–5 days",
       sizes: ["Standard"],
-      slug: "cement",
+      category: {
+        name: "Cement",
+        slug: "cement",
+      },
     },
     images: [
       "https://cdn-media.buildersmart.in/media/catalog/product/cache/1/image/9df78eab33525d08d6e5fb8d27136e95/c/e/ceba1cre0002_2.png",
@@ -139,10 +166,14 @@ export const productData: Product[] = [
       { stars: 1, count: 7 },
     ],
   },
+
   {
     id: "105",
     details: {
-      brand: "Sugna",
+      brand: {
+        name: "Jindal Steel & Power",
+        slug: "jindal-steel-power",
+      },
       name: "Sugna TMT Fe-550 Grade - 16mm",
       volume: "Standard",
       productCode: "PRD-106",
@@ -154,7 +185,10 @@ export const productData: Product[] = [
       treatsPoints: 2690,
       deliveryDate: "Delivered in 3–5 days",
       sizes: ["Standard"],
-      slug: "steel-bar",
+      category: {
+        name: "TMT Steel Bars",
+        slug: "tmt-steel-bars",
+      },
     },
     images: [
       "https://cdn-media.buildersmart.in/media/catalog/product/cache/1/image/200x200/9df78eab33525d08d6e5fb8d27136e95/s/u/sugna_tmt_image_3.jpg",
@@ -167,10 +201,14 @@ export const productData: Product[] = [
       { stars: 1, count: 74 },
     ],
   },
+
   {
     id: "106",
     details: {
-      brand: "ACC",
+      brand: {
+        name: "ACC",
+        slug: "acc",
+      },
       name: "ACC Suraksha Cement",
       volume: "Standard",
       productCode: "PRD-107",
@@ -182,7 +220,10 @@ export const productData: Product[] = [
       treatsPoints: 15,
       deliveryDate: "Delivered in 3–5 days",
       sizes: ["Standard"],
-      slug: "cement",
+      category: {
+        name: "Cement",
+        slug: "cement",
+      },
     },
     images: [
       "https://cdn-media.buildersmart.in/media/catalog/product/cache/1/image/9df78eab33525d08d6e5fb8d27136e95/c/e/ceppcgacc0001.png",
@@ -199,7 +240,10 @@ export const productData: Product[] = [
   {
     id: "107",
     details: {
-      brand: "Electronics",
+      brand: {
+        name: "Havells",
+        slug: "havells",
+      },
       name: "Bajaj CUB LED Street Light 25W",
       volume: "Standard",
       productCode: "PRD-107",
@@ -211,7 +255,10 @@ export const productData: Product[] = [
       treatsPoints: 65,
       deliveryDate: "Delivered in 3–5 days",
       sizes: ["Standard"],
-      slug: "electronics",
+      category: {
+        name: "Lighting & Fixtures",
+        slug: "lighting-fixtures",
+      },
     },
     images: [
       "https://cdn-media.buildersmart.in/media/catalog/product/cache/1/image/9df78eab33525d08d6e5fb8d27136e95/c/u/cub_led_street_light-bajaj_2.jpg",
@@ -228,7 +275,10 @@ export const productData: Product[] = [
   {
     id: "108",
     details: {
-      brand: "Philips",
+      brand: {
+        name: "Philips",
+        slug: "philips",
+      },
       name: "Philips Master LED Bulb",
       volume: "Standard",
       productCode: "PRD-108",
@@ -240,7 +290,10 @@ export const productData: Product[] = [
       treatsPoints: 10,
       deliveryDate: "Delivered in 3–5 days",
       sizes: ["Standard"],
-      slug: "electronics",
+      category: {
+        name: "Lighting & Fixtures",
+        slug: "lighting-fixtures",
+      },
     },
     images: [
       "https://cdn-media.buildersmart.in/media/catalog/product/cache/1/image/9df78eab33525d08d6e5fb8d27136e95/1/8/18w.jpg",
@@ -257,7 +310,10 @@ export const productData: Product[] = [
   {
     id: "109",
     details: {
-      brand: "Dulux",
+      brand: {
+        name: "Asian Paints",
+        slug: "asian-paints",
+      },
       name: "Dulux ICI Duwel Acrylic Wall Putty - 5 Kg",
       volume: "5 Kg",
       productCode: "PRD-109",
@@ -269,7 +325,10 @@ export const productData: Product[] = [
       treatsPoints: 17,
       deliveryDate: "Delivered in 3–5 days",
       sizes: ["5 Kg"],
-      slug: "paint",
+      category: {
+        name: "Paints & Finishes",
+        slug: "paints-finishes",
+      },
     },
     images: [
       "https://cdn-media.buildersmart.in/media/catalog/product/cache/1/image/9df78eab33525d08d6e5fb8d27136e95/p/f/pfwcptdlx0108.jpg",
@@ -286,7 +345,10 @@ export const productData: Product[] = [
   {
     id: "110",
     details: {
-      brand: "Dulux",
+      brand: {
+        name: "Asian Paints",
+        slug: "asian-paints",
+      },
       name: "Dulux Smoothover - Putty - 4 Ltr",
       volume: "4 Ltr",
       productCode: "PRD-110",
@@ -298,7 +360,10 @@ export const productData: Product[] = [
       treatsPoints: 20,
       deliveryDate: "Delivered in 3–5 days",
       sizes: ["4 Ltr"],
-      slug: "paint",
+      category: {
+        name: "Paints & Finishes",
+        slug: "paints-finishes",
+      },
     },
     images: [
       "https://cdn-media.buildersmart.in/media/catalog/product/cache/1/image/9df78eab33525d08d6e5fb8d27136e95/p/f/pfwcptdlx0105_1.jpg",

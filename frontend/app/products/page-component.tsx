@@ -3,7 +3,12 @@
 import React from "react";
 import { SlidersHorizontal, X } from "lucide-react";
 import { FilterSection } from "@/components/filter/filter-section";
-import { type CategoryLink, categoryLinks } from "@/lib/constants";
+import {
+  allBrands,
+  Brand,
+  type CategoryLink,
+  categoryLinks,
+} from "@/lib/constants";
 import { productData, type Product as ProductType } from "@/lib/data";
 import { ProductCard } from "@/components/product/product-card";
 import {
@@ -40,8 +45,6 @@ export function PageComponent() {
     parseAsInteger.withDefault(0)
   );
 
-  const allBrands = ["Kimirica", "Vaseline", "The Body Shop", "O3+"];
-
   const handleCategoryChange = (cat: string) => {
     setCategories((prev) =>
       prev.includes(cat) ? prev.filter((c) => c !== cat) : [...prev, cat]
@@ -64,10 +67,12 @@ export function PageComponent() {
       const meetsDiscount = discount ? p.details.couponOffer >= discount : true;
 
       const meetsCategory =
-        categories.length > 0 ? categories.includes(p.details.slug) : true;
+        categories.length > 0
+          ? categories.includes(p.details.category.slug)
+          : true;
 
       const meetsBrand =
-        brands.length > 0 ? brands.includes(p.details.brand) : true;
+        brands.length > 0 ? brands.includes(p.details.brand.slug) : true;
 
       return inPriceRange && meetsDiscount && meetsCategory && meetsBrand;
     });
@@ -135,14 +140,17 @@ export function PageComponent() {
           {/* Brand Filter */}
           <FilterSection title="Brand">
             <div className="space-y-2">
-              {allBrands.map((brand: string) => (
-                <label key={brand} className="flex items-center gap-2 text-md">
+              {allBrands.map((brand: Brand) => (
+                <label
+                  key={brand.slug}
+                  className="flex items-center gap-2 text-md"
+                >
                   <input
                     type="checkbox"
-                    checked={brands.includes(brand)}
-                    onChange={() => handleBrandChange(brand)}
+                    checked={brands.includes(brand.slug)}
+                    onChange={() => handleBrandChange(brand.slug)}
                   />
-                  {brand}
+                  {brand.name}
                 </label>
               ))}
             </div>
@@ -191,8 +199,7 @@ export function PageComponent() {
       {/* RIGHT PRODUCT GRID */}
       <main className="flex-1">
         <h2 className="font-semibold text-xl mb-4">
-          Bath & Body Sets & Bundles (
-          {filteredProducts && filteredProducts.length} items)
+          Found ({filteredProducts && filteredProducts.length} items)
         </h2>
 
         <div className="grid gap-3 grid-cols-[repeat(auto-fit,minmax(300px,1fr))]">

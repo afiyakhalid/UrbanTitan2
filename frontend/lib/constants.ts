@@ -432,3 +432,58 @@ export const categoryLinks: CategoryLink[] = [
     ],
   },
 ];
+
+export interface Brand {
+  name: string;
+  slug: string;
+  href: string;
+}
+
+export const allBrands: Brand[] = [
+  {
+    name: "Ambuja Cement",
+    slug: "ambuja-cement",
+    href: "/brands/ambuja-cement",
+  },
+  { name: "Asian Paints", slug: "asian-paints", href: "/brands/asian-paints" },
+  {
+    name: "Birla A1 StrongCrete",
+    slug: "birla-a1-strongcrete",
+    href: "/brands/birla-a1-strongcrete",
+  },
+  {
+    name: "Bondit Construction Chemicals",
+    slug: "bondit",
+    href: "/brands/bondit",
+  },
+  { name: "CenturyPly", slug: "centuryply", href: "/brands/centuryply" },
+  { name: "Grasim", slug: "grasim", href: "/brands/grasim" },
+  { name: "Godrej", slug: "godrej", href: "/brands/godrej" },
+  { name: "Greenpanel", slug: "greenpanel", href: "/brands/greenpanel" },
+  {
+    name: "Greenstone AAC Blocks",
+    slug: "greenstone",
+    href: "/brands/greenstone",
+  },
+  { name: "Havells", slug: "havells", href: "/brands/havells" },
+  { name: "Hindware", slug: "hindware", href: "/brands/hindware" },
+  { name: "Jaquar", slug: "jaquar", href: "/brands/jaquar" },
+  {
+    name: "Jindal Steel & Power",
+    slug: "jindal-steel-power",
+    href: "/brands/jindal-steel-power",
+  },
+  { name: "Kajaria", slug: "kajaria", href: "/brands/kajaria" },
+  {
+    name: "My Home by Saint-Gobain",
+    slug: "my-home-saint-gobain",
+    href: "/brands/my-home-saint-gobain",
+  },
+  { name: "Somany", slug: "somany", href: "/brands/somany" },
+  { name: "Tata Tiscon", slug: "tata-tiscon", href: "/brands/tata-tiscon" },
+  {
+    name: "RINL Vizag Steel",
+    slug: "vizag-steel",
+    href: "/brands/vizag-steel",
+  },
+];

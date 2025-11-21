@@ -34,9 +34,9 @@ export function ProductCard({
         <div className="flex items-center justify-between">
           {/* Category */}
           <p className="text-[1rem] text-gray-500 font-medium">
-            {item.details.slug
-              ? item.details.slug.charAt(0).toUpperCase() +
-                item.details.slug.slice(1)
+            {item.details.category.slug
+              ? item.details.category.slug.charAt(0).toUpperCase() +
+                item.details.category.slug.slice(1)
               : "General"}
           </p>
 

@@ -96,7 +96,7 @@ export function ProductDetails({ data }: { data: ProductDetailsType }) {
   return (
     <div className="w-full lg:w-1/2 p-4">
       <h1 className="text-xs md:text-sm font-light uppercase tracking-wider text-gray-500">
-        {data.brand}
+        {data.brand.name}
       </h1>
 
       <h2 className="text-xl md:text-2xl font-normal text-gray-900 leading-snug mb-2">
