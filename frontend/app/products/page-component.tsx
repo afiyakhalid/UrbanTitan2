@@ -17,6 +17,7 @@ import {
   parseAsInteger,
   parseAsString,
 } from "nuqs";
+import { CategoryDropdown } from "@/components/filter/category-dropdown";
 
 export function PageComponent() {
   const [open, setOpen] = React.useState<boolean>(false);
@@ -45,11 +46,16 @@ export function PageComponent() {
     parseAsInteger.withDefault(0)
   );
 
-  const handleCategoryChange = (cat: string) => {
-    setCategories((prev) =>
-      prev.includes(cat) ? prev.filter((c) => c !== cat) : [...prev, cat]
-    );
-    setOpen(false);
+  const handleCategoryChange = (slug: string) => {
+    let updated = [...categories];
+
+    if (updated.includes(slug)) {
+      updated = updated.filter((c) => c !== slug);
+    } else {
+      updated.push(slug);
+    }
+
+    setCategories([...updated]);
   };
 
   const handleBrandChange = (brand: string) => {
@@ -122,17 +128,12 @@ export function PageComponent() {
           <FilterSection title="Category">
             <div className="space-y-2">
               {categoryLinks.map((cat: CategoryLink) => (
-                <label
+                <CategoryDropdown
                   key={cat.slug}
-                  className="cursor-pointer flex items-center gap-2 text-md"
-                >
-                  <input
-                    type="checkbox"
-                    checked={categories.includes(cat.slug)}
-                    onChange={() => handleCategoryChange(cat.slug)}
-                  />
-                  {cat.name}
-                </label>
+                  category={cat}
+                  selected={categories}
+                  onSubCategoryChange={handleCategoryChange}
+                />
               ))}
             </div>
           </FilterSection>

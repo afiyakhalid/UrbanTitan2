@@ -18,7 +18,7 @@ export default function Page({
     <div className="max-w-8xl mx-auto px-12 py-8">
       <div className="flex flex-col lg:flex-row -mx-4">
         <ProductImageGallery images={product.images} />
-        <ProductDetails data={product.details} />
+        <ProductDetails product={product} />
       </div>
 
       <ProductRatings

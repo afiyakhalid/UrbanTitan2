@@ -1,6 +1,6 @@
 "use client";
 
-import { type ProductDetails as ProductDetailsType } from "@/lib/data";
+import { type Product as ProductType } from "@/lib/data";
 import { ChevronRight, Minus, Plus, Scale, Star } from "lucide-react";
 import React from "react";
 import {
@@ -10,7 +10,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { RatingStars } from "../rating/rating-stars";
+import { RatingStars } from "@/components/rating/rating-stars";
+import { allBrands } from "@/lib/constants";
+import { useCartStore } from "@/store/store";
 
 const CheckIcon = () => (
   <svg
@@ -68,6 +70,7 @@ function AccordionItem({
   children: React.ReactNode;
 }) {
   const [isOpen, setIsOpen] = React.useState(false);
+
   return (
     <div className="border-b border-gray-200">
       <button
@@ -88,30 +91,45 @@ function AccordionItem({
   );
 }
 
-export function ProductDetails({ data }: { data: ProductDetailsType }) {
-  const [selectedSize, setSelectedSize] = React.useState(data.sizes[1]);
+export function ProductDetails({ product }: { product: ProductType }) {
+  const { addToCart } = useCartStore();
+  const [selectedSize, setSelectedSize] = React.useState(
+    product.details.sizes[1]
+  );
 
-  const offPercentage = Math.round(((data.mrp - data.price) / data.mrp) * 100);
+  const handleCompare = (cat: string) => {
+    const allBrandSlugs = allBrands.map((b) => b.slug);
+
+    const params = new URLSearchParams();
+    params.set("categories", cat);
+    params.set("brands", allBrandSlugs.join(","));
+
+    window.location.href = `/products?${params.toString()}`;
+  };
+
+  const offPercentage = Math.round(
+    ((product.details.mrp - product.details.price) / product.details.mrp) * 100
+  );
 
   return (
     <div className="w-full lg:w-1/2 p-4">
       <h1 className="text-xs md:text-sm font-light uppercase tracking-wider text-gray-500">
-        {data.brand.name}
+        {product.details.brand.name}
       </h1>
 
       <h2 className="text-xl md:text-2xl font-normal text-gray-900 leading-snug mb-2">
-        {data.name} ({data.volume})
+        {product.details.name} ({product.details.volume})
       </h2>
 
       <div className="flex flex-wrap items-center text-sm text-gray-600 mb-4">
         <span className="px-1 text-md text-gray-900 font-semibold">
-          {Number(data.rating).toFixed(1)}
+          {Number(product.details.rating).toFixed(1)}
         </span>
 
-        <RatingStars rating={data.rating} />
+        <RatingStars rating={product.details.rating} />
 
         <span className="px-2 text-sm text-gray-500 border-r border-gray-300">
-          {data.reviewCount} Ratings
+          {product.details.reviewCount} Ratings
         </span>
 
         <a
@@ -123,9 +141,9 @@ export function ProductDetails({ data }: { data: ProductDetailsType }) {
       </div>
 
       <div className="text-xl md:text-2xl font-semibold text-gray-900 mb-4">
-        ₹{data.price.toLocaleString()}
+        ₹{product.details.price.toLocaleString()}
         <span className="text-sm md:text-lg font-light text-gray-500 line-through ml-2">
-          ₹{data.mrp.toLocaleString()}
+          ₹{product.details.mrp.toLocaleString()}
         </span>
         <span className="text-red-600 text-base md:text-lg font-semibold ml-2">
           ({offPercentage}% Off)
@@ -137,7 +155,7 @@ export function ProductDetails({ data }: { data: ProductDetailsType }) {
 
       <div className="flex justify-between items-center bg-gray-100 px-3 py-3 my-3 rounded-lg cursor-pointer hover:bg-gray-200 transition text-sm md:text-base">
         <p className="font-semibold text-gray-900">
-          Get for ₹{data.couponOffer} with coupon + offers
+          Get for ₹{product.details.couponOffer} with coupon + offers
         </p>
 
         <ChevronRight className="w-5 h-5" />
@@ -152,7 +170,7 @@ export function ProductDetails({ data }: { data: ProductDetailsType }) {
           </SelectTrigger>
 
           <SelectContent>
-            {data.sizes.map((size) => (
+            {product.details.sizes.map((size) => (
               <SelectItem key={size} value={size}>
                 {size}
               </SelectItem>
@@ -162,12 +180,18 @@ export function ProductDetails({ data }: { data: ProductDetailsType }) {
       </div>
 
       <div className="flex flex-col sm:flex-row sm:space-x-4 space-y-3 sm:space-y-0 mb-6">
-        <button className="cursor-pointer py-3 px-6 flex items-center gap-2 border border-gray-400 text-lg text-gray-800 rounded-md font-semibold hover:bg-gray-50 transition">
+        <button
+          onClick={() => handleCompare(product.details.category.slug)}
+          className="cursor-pointer py-3 px-6 flex items-center gap-2 border border-gray-400 text-lg text-gray-800 rounded-md font-semibold hover:bg-gray-50 transition"
+        >
           <Scale className="w-6 h-6" />
           Compare
         </button>
 
-        <button className="flex-1 cursor-pointer py-3 bg-black text-white rounded-md font-semibold text-lg hover:bg-gray-800 transition">
+        <button
+          onClick={() => addToCart(product, 1)}
+          className="flex-1 cursor-pointer py-3 bg-black text-white rounded-md font-semibold text-lg hover:bg-gray-800 transition"
+        >
           Add To Bag
         </button>
       </div>
@@ -177,7 +201,7 @@ export function ProductDetails({ data }: { data: ProductDetailsType }) {
           <p className="font-medium text-gray-800">
             Delivery Options{" "}
             <span className="text-sm font-normal text-gray-500">
-              ({data.productCode})
+              ({product.details.productCode})
             </span>
           </p>
           <button className="text-red-600 font-medium hover:text-red-700">
@@ -187,7 +211,7 @@ export function ProductDetails({ data }: { data: ProductDetailsType }) {
 
         <p className="flex items-center text-sm md:text-md font-semibold text-green-600">
           <CheckIcon />
-          Free Delivery - Get it by {data.deliveryDate}
+          Free Delivery - Get it by {product.details.deliveryDate}
         </p>
       </div>
 

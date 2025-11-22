@@ -26,15 +26,24 @@ export function Hero() {
   React.useEffect(() => {
     const interval = setInterval(() => {
       setCurrent((prev) => (prev + 1) % carouselData.length);
-    }, 5000);
+    }, 8000);
 
     return () => clearInterval(interval);
   }, []);
 
   return (
     <section className="relative overflow-hidden">
+      <div className="mx-auto w-full max-w-3xl">
+        <div className="bg-gradient-to-r from-gray-100 via-gray-50 to-gray-100 text-gray-800 py-3 rounded-b-sm shadow-sm border border-gray-200 flex items-center justify-center text-center">
+          <p className="text-sm md:text-[1rem] font-semibold tracking-wide">
+            🚚 We deliver exclusively across Bangalore — Fast, Reliable & Safe
+            Delivery!
+          </p>
+        </div>
+      </div>
+
       <div
-        className="flex transition-transform duration-700 ease-out"
+        className="flex transition-transform duration-700 ease-out pt-6"
         style={{
           width: `${carouselData.length * 100}%`,
           transform: `translateX(-${current * (100 / carouselData.length)}%)`,
