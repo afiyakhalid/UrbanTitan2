@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import React from "react";
 
 const carouselData = [
@@ -32,9 +33,9 @@ export function Hero() {
   }, []);
 
   return (
-    <section className="relative overflow-hidden">
+    <section className="relative overflow-hidden max-w-7xl mx-auto">
       <div className="mx-auto w-full max-w-3xl">
-        <div className="bg-gradient-to-r from-gray-100 via-gray-50 to-gray-100 text-gray-800 py-3 rounded-b-sm shadow-sm border border-gray-200 flex items-center justify-center text-center">
+        <div className="bg-gradient-to-r from-gray-100 via-gray-50 to-gray-100 text-gray-800 py-3 rounded-b-sm shadow-xs border border-gray-200 flex items-center justify-center text-center">
           <p className="text-sm md:text-[1rem] font-semibold tracking-wide">
             🚚 We deliver exclusively across Bangalore — Fast, Reliable & Safe
             Delivery!
@@ -52,20 +53,16 @@ export function Hero() {
         {carouselData.map((item, index) => (
           <div
             key={index}
-            className="w-full flex-shrink-0"
+            className="w-full h-full flex-shrink-0"
             style={{ width: `${100 / carouselData.length}%` }}
           >
-            <div className="w-full mx-auto px-4 flex flex-col lg:flex-row items-center justify-between">
-              <div className="w-full relative flex justify-center lg:justify-end mt-10 lg:mt-0">
-                <div className="relative w-full rounded-md overflow-hidden  ">
+            <div className="w-full h-full mx-auto flex flex-col lg:flex-row items-center justify-between">
+              <div className="w-full h-full relative flex justify-center lg:justify-end mt-10 lg:mt-0">
+                <div className="relative w-full h-full overflow-hidden  ">
                   <img
                     src={item.image}
                     alt={item.title}
                     className="w-full h-full object-contain"
-                    style={{
-                      objectFit: "contain",
-                      objectPosition: "bottom right",
-                    }}
                   />
                 </div>
               </div>

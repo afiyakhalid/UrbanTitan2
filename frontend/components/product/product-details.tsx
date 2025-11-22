@@ -13,6 +13,7 @@ import {
 import { RatingStars } from "@/components/rating/rating-stars";
 import { allBrands } from "@/lib/constants";
 import { useCartStore } from "@/store/store";
+import { redirect } from "next/navigation";
 
 const CheckIcon = () => (
   <svg
@@ -189,7 +190,10 @@ export function ProductDetails({ product }: { product: ProductType }) {
         </button>
 
         <button
-          onClick={() => addToCart(product, 1)}
+          onClick={() => {
+            addToCart(product, 1);
+            redirect("/cart");
+          }}
           className="flex-1 cursor-pointer py-3 bg-black text-white rounded-md font-semibold text-lg hover:bg-gray-800 transition"
         >
           Add To Bag

@@ -110,7 +110,7 @@ export function FeatureCard({ feature }: { feature: Feature }) {
 
 export function FeatureHighlights() {
   return (
-    <section className="bg-orange-50/70 my-8 py-12 px-8 rounded-lg border border-black/10 shadow-xs mx-auto max-w-[90rem] mb-12">
+    <section className="max-w-7xl mx-auto bg-orange-50/70 my-12 px-4 py-12 rounded-sm border border-black/10 shadow-xs">
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
         {featuresData.map((feature, index) => (
           <FeatureCard key={index} feature={feature} />

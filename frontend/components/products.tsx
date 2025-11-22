@@ -25,7 +25,7 @@ export function Products() {
   };
 
   return (
-    <section className="max-w-8xl mx-auto px-8 py-4">
+    <section className="max-w-7xl mx-auto py-4">
       <h2 className="px-1 text-2xl md:text-3xl lg:text-4xl font-noraml text-gray-900 mb-8">
         Top Selling Products
       </h2>

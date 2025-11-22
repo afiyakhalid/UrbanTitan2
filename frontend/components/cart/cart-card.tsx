@@ -27,7 +27,7 @@ export function CartItemCard({ item }: { item: CartItemType }) {
           width={80}
           alt={item.details.name}
           src={item.images[0]}
-          className="object-cover w-full h-full"
+          className="object-contain w-full h-full"
         />
       </div>
 
