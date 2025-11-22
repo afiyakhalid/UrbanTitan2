@@ -90,7 +90,7 @@ export function Categories() {
   };
 
   return (
-    <section className="max-w-8xl mx-auto px-8 py-8 pt-12">
+    <section className="max-w-7xl mx-auto py-8 pt-12">
       <div className="flex justify-between items-center mb-8">
         <h2 className="px-1 text-2xl md:text-3xl lg:text-4xl font-normal text-gray-900">
           Top Categories

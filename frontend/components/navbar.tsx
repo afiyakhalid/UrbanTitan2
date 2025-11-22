@@ -52,7 +52,7 @@ function DesktopCategory() {
   const [openMenu, setOpenMenu] = React.useState<number | null>(null);
 
   return (
-    <div className="hidden sm:block border-t border-gray-200 bg-white relative z-40">
+    <div className="hidden sm:block bg-white relative z-40">
       <nav className="overflow-x-auto scrollbar-hide px-10 py-3">
         <ul className="flex flex-nowrap text-sm text-gray-700 whitespace-nowrap space-x-3">
           {categoryLinks.map((link, index) => (
@@ -219,7 +219,7 @@ export function Header() {
     <>
       {/* Desktop Navbar */}
       <header className="bg-white sticky top-0 z-50">
-        <div className="max-w-8xl mx-auto px-2 md:px-12 py-2 md:py-4 flex items-center justify-between gap-4 flex-wrap">
+        <div className="max-w-7xl mx-auto px-2 md:px-12 py-2 md:py-4 flex items-center justify-between gap-4 flex-wrap">
           <div className="flex items-end space-x-6 flex-shrink-0">
             <button
               className="md:hidden p-2"
@@ -330,8 +330,10 @@ export function Header() {
         </div>
 
         {/* Desktop Category Links */}
-        <div className="border-b border-gray-200">
-          <DesktopCategory />
+        <div className="border-y border-gray-200">
+          <div className="max-w-7xl mx-auto">
+            <DesktopCategory />
+          </div>
         </div>
       </header>
 
@@ -349,7 +351,7 @@ export function Header() {
           </button>
         </div>
 
-        <ul className="space-y-3">
+        <ul className="space-y-4">
           {navLinks.map((link) => (
             <li key={link.name}>
               <a

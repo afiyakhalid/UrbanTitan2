@@ -57,13 +57,14 @@ export function Footer() {
   const currentYear = new Date().getFullYear();
 
   return (
-    <footer className="bg-white border-t border-gray-100 max-w-8xl mx-auto px-8 py-8">
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center">
+    <footer className="bg-white border-t border-gray-100 px-8 py-8">
+      <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-start md:items-center">
         <div className="flex flex-col mb-4 md:mb-0">
           <p className="text-sm md:text-[1.1rem] font-semibold text-gray-900 mb-4">
             © {currentYear} Urban Titan. All Rights Reserved.
           </p>
-          <div className="flex flex-wrap text-xs md:text-sm text-gray-700 space-x-4 md:space-x-6">
+
+          <div className="flex flex-wrap text-xs md:text-sm text-gray-700 space-x-4 md:space-x-6 space-y-4">
             {policyLinks.map((link) => (
               <a
                 key={link.name}

@@ -11,7 +11,7 @@ const topShelfs: ProductType[] = productData.filter(
 
 function TopShelfCard({ product }: { product: ProductType }) {
   return (
-    <div className="flex-shrink-0 w-[300px] md:w-[350px] bg-white rounded-lg overflow-hidden border border-gray-100 shadow-xs group">
+    <div className="flex-shrink-0 w-[300px] md:w-[350px] bg-white rounded-md overflow-hidden border border-gray-100 shadow-xs group">
       <div className="w-full h-[300px] relative overflow-hidden">
         <img
           src={product.images[0]}
@@ -73,7 +73,7 @@ export function TopShelf() {
 
   return (
     <section className="bg-pink-50/70 py-12 px-8">
-      <div className="max-w-8xl mx-auto">
+      <div className="max-w-7xl mx-auto">
         <div className="mb-8">
           <h2 className="text-4xl md:text-5xl tracking-widest text-gray-900 flex items-center">
             TOP SHELF
