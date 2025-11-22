@@ -14,6 +14,11 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { cn } from "@/lib/utils";
 import { type CategoryLink, categoryLinks } from "@/lib/constants";
+import { redirect } from "next/navigation";
+import { Badge } from "@/components/ui/badge";
+import { useCartStore } from "@/store/store";
+import Image from "next/image";
+import Logo from "@/assets/images/logo.png";
 
 interface UserLink {
   name: string;
@@ -203,6 +208,8 @@ function MobileCategory() {
 }
 
 export function Header() {
+  const { cart } = useCartStore();
+
   const [sidebarOpen, setSidebarOpen] = React.useState(false);
   const [profile, setProfile] = React.useState(false);
 
@@ -219,8 +226,16 @@ export function Header() {
               <Menu className="w-6 h-6 text-gray-800" />
             </button>
 
-            <div className="text-2xl md:text-3xl font-semibold flex justify-center items-end bg-gradient-to-r from-black via-gray-700 to-gray-500 bg-clip-text text-transparent">
-              UrbanTitan
+            <div className="flex items-end">
+              <Image
+                src={Logo}
+                alt="UrbanTitan Logo"
+                className="w-8 h-8 md:w-10 md:h-10 object-contain"
+              />
+
+              <span className="text-2xl md:text-3xl font-semibold text-black">
+                UrbanTitan
+              </span>
             </div>
 
             <div className="hidden sm:flex flex-col cursor-pointer group">
@@ -262,8 +277,17 @@ export function Header() {
           </div>
 
           <div className="flex items-center space-x-3 mt-3 sm:mt-0">
-            <div className="p-3 border rounded-full cursor-pointer hover:bg-gray-50">
+            <div
+              onClick={() => redirect("/cart")}
+              className="relative p-3 border rounded-full cursor-pointer hover:bg-gray-50"
+            >
               <ShoppingBag className="w-6 h-6 text-gray-700" />
+
+              {cart.length > 0 && (
+                <Badge className="absolute -top-1 -right-1 rounded-full px-2 py-0 text-xs h-5 min-w-[20px] flex items-center justify-center">
+                  {cart.length}
+                </Badge>
+              )}
             </div>
 
             <DropdownMenu
@@ -304,7 +328,9 @@ export function Header() {
         </div>
 
         {/* Desktop Category Links */}
-        <DesktopCategory />
+        <div className="border-b border-gray-200">
+          <DesktopCategory />
+        </div>
       </header>
 
       {/* Hamburger Menu */}

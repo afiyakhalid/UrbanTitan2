@@ -16,7 +16,7 @@ export function ProductCard({
     <Link
       href={`/products/${item.id}`}
       className={cn(
-        "relative flex flex-col flex-shrink-0 rounded-xl border border-gray-200/80 shadow-xs overflow-hidden group bg-white",
+        "relative flex flex-col flex-shrink-0 rounded-xl border border-gray-200/80 shadow-md overflow-hidden group bg-white",
         widthAutoTake ? "w-full h-108" : "w-[250px] md:w-[300px] h-108"
       )}
     >
