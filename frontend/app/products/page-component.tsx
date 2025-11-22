@@ -7,7 +7,7 @@ import {
   allBrands,
   Brand,
   type CategoryLink,
-  categoryLinks,
+  allCategories,
 } from "@/lib/constants";
 import { productData, type Product as ProductType } from "@/lib/data";
 import { ProductCard } from "@/components/product/product-card";
@@ -127,7 +127,7 @@ export function PageComponent() {
           {/* Category Filter */}
           <FilterSection title="Category">
             <div className="space-y-2">
-              {categoryLinks.map((cat: CategoryLink) => (
+              {allCategories.map((cat: CategoryLink) => (
                 <CategoryDropdown
                   key={cat.slug}
                   category={cat}

@@ -13,7 +13,7 @@ import {
   DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
 import { cn } from "@/lib/utils";
-import { type CategoryLink, categoryLinks } from "@/lib/constants";
+import { type CategoryLink, allCategories } from "@/lib/constants";
 import { redirect } from "next/navigation";
 import { Badge } from "@/components/ui/badge";
 import { useCartStore } from "@/store/store";
@@ -55,14 +55,14 @@ function DesktopCategory() {
     <div className="hidden sm:block bg-white relative z-40">
       <nav className="overflow-x-auto scrollbar-hide px-10 py-3">
         <ul className="flex flex-nowrap text-sm text-gray-700 whitespace-nowrap space-x-3">
-          {categoryLinks.map((link, index) => (
+          {allCategories.map((category, index) => (
             <li
-              key={link.name}
+              key={category.name}
               className="relative"
               onMouseEnter={() => setOpenMenu(index)}
               onMouseLeave={() => setOpenMenu(null)}
             >
-              {link.children && link.children.length > 0 ? (
+              {category.children && category.children.length > 0 ? (
                 <DropdownMenu
                   modal={false}
                   open={openMenu === index}
@@ -70,17 +70,17 @@ function DesktopCategory() {
                 >
                   <DropdownMenuTrigger className="cursor-pointer" asChild>
                     <button className="cursor-pointer hover:text-red-600 text-sm md:text-md lg:text-[1.02rem] transition p-2 focus:outline-none focus:ring-0 data-[state=open]:outline-none data-[state=open]:ring-0">
-                      {link.name}
+                      {category.name}
                     </button>
                   </DropdownMenuTrigger>
 
-                  {link.children && link.children.length > 0 && (
+                  {category.children && category.children.length > 0 && (
                     <DropdownMenuContent
                       className="w-max shadow-xs rounded-none rounded-b-lg mt-2"
                       align="center"
                       side="bottom"
                     >
-                      {link.children.map((child) => (
+                      {category.children.map((child) => (
                         <div key={child.name}>
                           {child.children && child.children.length > 0 ? (
                             <DropdownMenuSub>
@@ -118,10 +118,10 @@ function DesktopCategory() {
                 </DropdownMenu>
               ) : (
                 <button
-                  onClick={() => (window.location.href = link.href)}
+                  onClick={() => (window.location.href = category.href)}
                   className="cursor-pointer hover:text-red-600 text-sm md:text-md lg:text-[1rem] transition p-2"
                 >
-                  {link.name}
+                  {category.name}
                 </button>
               )}
             </li>
@@ -201,7 +201,7 @@ function MobileCategory() {
           categoryOpen ? "max-h-[1000px]" : "max-h-0"
         }`}
       >
-        {categoryLinks.map((cat, idx) => (
+        {allCategories.map((cat, idx) => (
           <MobileCategoryItem key={idx} item={cat} level={1} />
         ))}
       </ul>
