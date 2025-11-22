@@ -19,6 +19,7 @@ import { Badge } from "@/components/ui/badge";
 import { useCartStore } from "@/store/store";
 import Image from "next/image";
 import Logo from "@/assets/images/logo.png";
+import Link from "next/link";
 
 interface UserLink {
   name: string;
@@ -35,6 +36,7 @@ interface NavLink {
 const navLinks: NavLink[] = [
   { name: "Top Brands", href: "/top-brands" },
   { name: "Local Brands", href: "/local-brands" },
+  { name: "Contractors", href: "/contractors" },
 ];
 
 const userLinks: UserLink[] = [
@@ -217,26 +219,26 @@ export function Header() {
     <>
       {/* Desktop Navbar */}
       <header className="bg-white sticky top-0 z-50">
-        <div className="max-w-8xl mx-auto px-12 py-4 flex items-center justify-between gap-4 flex-wrap">
+        <div className="max-w-8xl mx-auto px-2 md:px-12 py-2 md:py-4 flex items-center justify-between gap-4 flex-wrap">
           <div className="flex items-end space-x-6 flex-shrink-0">
             <button
-              className="sm:hidden p-2"
+              className="md:hidden p-2"
               onClick={() => setSidebarOpen(true)}
             >
               <Menu className="w-6 h-6 text-gray-800" />
             </button>
 
-            <div className="flex items-end">
+            <Link href="/" className="hover:cursor-pointer flex items-end">
               <Image
                 src={Logo}
                 alt="UrbanTitan Logo"
                 className="w-8 h-8 md:w-10 md:h-10 object-contain"
               />
 
-              <span className="text-2xl md:text-3xl font-semibold text-black">
+              <span className="text-xl md:text-2xl font-semibold text-black">
                 UrbanTitan
               </span>
-            </div>
+            </Link>
 
             <div className="hidden sm:flex flex-col cursor-pointer group">
               <p className="text-sm text-gray-700">Welcome</p>
@@ -332,15 +334,6 @@ export function Header() {
           <DesktopCategory />
         </div>
       </header>
-
-      {/* Hamburger Menu */}
-      <div
-        className={cn(
-          "fixed inset-0 bg-black/50 z-[60] transition-opacity",
-          sidebarOpen ? "opacity-100" : "opacity-0 pointer-events-none"
-        )}
-        onClick={() => setSidebarOpen(false)}
-      />
 
       {/* Mobile Sidebar */}
       <aside
