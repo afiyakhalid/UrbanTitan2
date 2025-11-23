@@ -35,7 +35,7 @@ export function Hero() {
   return (
     <section className="relative overflow-hidden max-w-7xl mx-auto">
       <div className="mx-auto w-full max-w-3xl">
-        <div className="bg-gradient-to-r from-gray-100 via-gray-50 to-gray-100 text-gray-800 py-3 rounded-b-sm shadow-xs border border-gray-200 flex items-center justify-center text-center">
+        <div className="bg-gradient-to-r mt-3 from-gray-100 via-gray-50 to-gray-100 text-gray-800 py-3 rounded-b-sm shadow-xs border border-gray-200 flex items-center justify-center text-center">
           <p className="text-sm md:text-[1rem] font-semibold tracking-wide">
             🚚 We deliver exclusively across Bangalore — Fast, Reliable & Safe
             Delivery!
