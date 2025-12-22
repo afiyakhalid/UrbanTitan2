@@ -1,0 +1,12 @@
+spring:
+  application:
+    name: UrbanTitan
+  datasource:
+    url: jdbc:postgresql://localhost:5432/UrbanTitan
+    username: khadiuzz
+    password: Tawakkul
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true

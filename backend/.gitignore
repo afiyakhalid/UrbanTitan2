@@ -1,10 +1,8 @@
 .idea/
 gradle/
 *.log
-*.yaml
 *.xml
 *.jar
-*.properties
 *.docx
 *.bin
 *.lock
