@@ -28,6 +28,10 @@ public class CategoryController {
     public ResponseEntity<List<CategoryResponseDTO>> getAllCategories() {
         return ResponseEntity.ok(categoryService.getAllCategories());
     }
+    @GetMapping("/{category-name}")
+    public ResponseEntity<CategoryResponseDTO> getCategoryBySlug(@PathVariable("category-name") String slug) {
+        return ResponseEntity.ok(categoryService.getCategoryBySlug(slug));
+    }
 
     @GetMapping("/{id}")
     public ResponseEntity<CategoryResponseDTO> getCategory(@PathVariable UUID id) {

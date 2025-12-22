@@ -18,10 +18,7 @@ import java.util.UUID;
     name = "orders",
     indexes = {
         @Index(name = "ordersUserIdx", columnList = "user_id"),
-        @Index(name = "ordersOrgIdx", columnList = "organization_id"),
-        @Index(name = "ordersContractIdx", columnList = "contract_id"),
-        @Index(name = "ordersStatusIdx", columnList = "status"),
-        @Index(name = "ordersDateIdx", columnList = "created_at")
+        @Index(name = "ordersStatusIdx", columnList = "status")
     }
 )
 public class Order {
