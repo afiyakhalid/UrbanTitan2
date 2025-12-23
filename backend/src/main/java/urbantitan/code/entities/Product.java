@@ -50,7 +50,7 @@ public class Product {
     private Category category;
 
     @Column(name = "is_active", nullable = false)
-    private Boolean isActive = true;
+    private Boolean isActive = Boolean.TRUE;
 
     @Column(name = "primary_image_url")
     private String primaryImageUrl;

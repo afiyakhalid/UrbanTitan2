@@ -43,7 +43,7 @@ public class ProductRequestDTO {
     private UUID categoryId;
 
     @NotNull(message = "isActive flag is required")
-    private Boolean isActive = true;
+    private Boolean isActive = Boolean.TRUE;
 
     @Pattern(
         regexp = "^(https?|ftp)://.*$",

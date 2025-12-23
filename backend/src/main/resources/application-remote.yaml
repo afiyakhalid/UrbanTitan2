@@ -8,3 +8,6 @@ spring:
     hibernate:
       ddl-auto: update
     show-sql: false
+google:
+  oauth:
+    client-id: 832116839355-48a8rih6jiq88so34mdd9s4apdfsqlkb.apps.googleusercontent.com

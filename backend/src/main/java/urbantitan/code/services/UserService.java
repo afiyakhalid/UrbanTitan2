@@ -4,6 +4,7 @@ import org.modelmapper.ModelMapper;
 import urbantitan.code.dto.user.UserRequestDTO;
 import urbantitan.code.dto.user.UserResponseDTO;
 import urbantitan.code.entities.User;
+import urbantitan.code.enums.ROLES;
 import urbantitan.code.repositories.UserRepository;
 import org.springframework.stereotype.Service;
 import lombok.RequiredArgsConstructor;
@@ -32,9 +33,9 @@ public class UserService {
         User newUser = modelMapper.map(userRequestDto, User.class);
 
         if (userRequestDto.getRole() == null || userRequestDto.getRole().isBlank()) {
-            newUser.setRole(User.Role.USER);
+            newUser.setRole(ROLES.USER);
         } else {
-            newUser.setRole(User.Role.valueOf(userRequestDto.getRole().toUpperCase()));
+            newUser.setRole(ROLES.valueOf(userRequestDto.getRole().toUpperCase()));
         }
 
         User user = userRepository.save(newUser);
@@ -52,15 +53,14 @@ public class UserService {
                 case "emailVerified" -> {
                     if (value != null) {
                         user.setEmailVerified(OffsetDateTime.parse(value.toString()));
+                    } else {
+                        user.setEmailVerified(null);
                     }
-                    user.setEmailVerified(null);
                 }
-
-                case "image" -> user.setImage((String) value);
 
                 case "role" -> {
                     try {
-                        user.setRole(User.Role.valueOf(value.toString().toUpperCase()));
+                        user.setRole(ROLES.valueOf(value.toString().toUpperCase()));
                     } catch (IllegalArgumentException e) {
                         throw new IllegalArgumentException("Invalid role: " + value);
                     }

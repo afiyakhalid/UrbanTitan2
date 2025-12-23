@@ -19,5 +19,5 @@ public class CategoryRequestDTO {
     @Size(min = 10, max = 1024, message = "Description must be between 10 and 1024 characters")
     private String description;
 
-    private String isActive = "true";
+    private Boolean isActive = Boolean.TRUE;
 }

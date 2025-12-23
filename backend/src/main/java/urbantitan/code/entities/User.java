@@ -4,6 +4,10 @@ import java.time.OffsetDateTime;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.annotations.CreationTimestamp;
+import urbantitan.code.enums.ROLES;
+import urbantitan.code.enums.Status;
+
 import java.util.UUID;
 
 @Entity
@@ -25,15 +29,16 @@ public class User {
     @Column(name = "email_verified")
     private OffsetDateTime emailVerified;
 
-    @Column(name = "image")
-    private String image;
+    @Column(unique = true)
+    private String phoneNumber;
 
-    @Column(name = "created_at", nullable = false, updatable = false)
-    private OffsetDateTime createdAt = OffsetDateTime.now();
-  
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
-    private Role role = Role.USER;
+    private ROLES role = ROLES.USER;
 
-    public enum Role { ADMIN, MANUFACTURER, USER }
+    @Enumerated(EnumType.STRING)
+    private Status status = Status.ACTIVE;
+
+    @CreationTimestamp
+    @Column(name = "created_at", nullable = false, updatable = false)
+    private OffsetDateTime createdAt;
 }

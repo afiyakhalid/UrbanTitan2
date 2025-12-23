@@ -74,7 +74,7 @@ public class CategoryService {
 
                 case "description" -> category.setDescription(value.toString());
 
-                case "isActive" -> category.setIsActive(value.toString());
+                case "isActive" -> category.setIsActive(value != null && Boolean.parseBoolean(value.toString()));
 
                 default -> throw new IllegalArgumentException("Field not allowed for update: " + field);
             }
