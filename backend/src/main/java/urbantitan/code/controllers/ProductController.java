@@ -35,6 +35,11 @@ public class ProductController {
         return ResponseEntity.status(HttpStatus.OK).body(productService.getProductBySlug(slug));
     }
 
+    @GetMapping("/category/{category_id}")
+    public ResponseEntity<List<ProductResponseDTO>> getProductsByCategoryId(@PathVariable UUID category_id) {
+        return ResponseEntity.status(HttpStatus.OK).body(productService.getProductsByCategoryId(category_id));
+    }
+
     @PostMapping("/")
     public ResponseEntity<ProductResponseDTO> createProduct(@Valid @RequestBody ProductRequestDTO requestDTO) {
         return ResponseEntity.status(HttpStatus.CREATED).body(productService.createProduct(requestDTO));

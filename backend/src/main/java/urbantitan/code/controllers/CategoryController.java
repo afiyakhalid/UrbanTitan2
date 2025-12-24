@@ -28,8 +28,8 @@ public class CategoryController {
     public ResponseEntity<List<CategoryResponseDTO>> getAllCategories() {
         return ResponseEntity.ok(categoryService.getAllCategories());
     }
-    @GetMapping("/slug/{category-name}")
-    public ResponseEntity<CategoryResponseDTO> getCategoryBySlug(@PathVariable("category-name") String slug) {
+    @GetMapping("/slug/{slug}")
+    public ResponseEntity<CategoryResponseDTO> getCategoryBySlug(@PathVariable("slug") String slug) {
         return ResponseEntity.ok(categoryService.getCategoryBySlug(slug));
     }
 

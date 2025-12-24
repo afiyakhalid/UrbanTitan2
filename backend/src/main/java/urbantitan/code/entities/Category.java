@@ -33,11 +33,11 @@ public class Category {
     @Column(name = "slug", nullable = false, length = 255)
     private String slug;
 
-    @Column(name = "description", nullable = false, length = 1024)
+    @Column(name = "description", length = 1024)
     private String description;
 
     @Column(name = "is_active")
-    private Boolean isActive;
+    private Boolean isActive = true;
 
     @UpdateTimestamp
     @Column(name = "updated_at", nullable = false)

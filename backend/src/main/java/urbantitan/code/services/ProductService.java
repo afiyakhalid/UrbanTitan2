@@ -30,6 +30,11 @@ public class ProductService {
         return products.stream().map(product -> productModelMapper.map(product, ProductResponseDTO.class)).toList();
     }
 
+    public List<ProductResponseDTO> getProductsByCategoryId(UUID categoryId) {
+        List<Product> products = productRepository.findByCategoryId(categoryId);
+        return products.stream().map(product -> productModelMapper.map(product, ProductResponseDTO.class)).toList();
+    }
+
     public ProductResponseDTO getProductById(UUID id) {
         Product product = productRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("Product not found with id: " + id));
         return productModelMapper.map(product, ProductResponseDTO.class);
