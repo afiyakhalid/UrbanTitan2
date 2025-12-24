@@ -8,6 +8,9 @@ import urbantitan.code.enums.ROLES;
 import urbantitan.code.repositories.UserRepository;
 import org.springframework.stereotype.Service;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import urbantitan.code.dto.user.LoginRequestDTO;
+
 import java.time.OffsetDateTime;
 import java.util.UUID;
 import java.util.List;
@@ -18,6 +21,7 @@ import java.util.Map;
 public class UserService {
     private final UserRepository userRepository;
     private final ModelMapper modelMapper;
+    private final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
     public List<UserResponseDTO> getAllUsers() {
         List<User> users = userRepository.findAll();
@@ -79,5 +83,29 @@ public class UserService {
             throw new IllegalArgumentException("Student does not exists by id: "+id);
         }
         userRepository.deleteById(id);
+    }
+
+    public UserResponseDTO registerUser(UserRequestDTO userRequestDto) {
+        if (userRepository.findByEmail(userRequestDto.getEmail()).isPresent()) {
+            throw new IllegalArgumentException("Email already registered");
+        }
+        User newUser = modelMapper.map(userRequestDto, User.class);
+        newUser.setPassword(passwordEncoder.encode(userRequestDto.getPassword()));
+        if (userRequestDto.getRole() == null || userRequestDto.getRole().isBlank()) {
+            newUser.setRole(ROLES.USER);
+        } else {
+            newUser.setRole(ROLES.valueOf(userRequestDto.getRole().toUpperCase()));
+        }
+        User user = userRepository.save(newUser);
+        return modelMapper.map(user, UserResponseDTO.class);
+    }
+
+    public User authenticateUser(LoginRequestDTO loginRequest) {
+        User user = userRepository.findByEmail(loginRequest.getEmail())
+                .orElseThrow(() -> new IllegalArgumentException("Invalid email or password"));
+        if (!passwordEncoder.matches(loginRequest.getPassword(), user.getPassword())) {
+            throw new IllegalArgumentException("Invalid email or password");
+        }
+        return user;
     }
 }
