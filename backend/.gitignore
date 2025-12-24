@@ -9,6 +9,7 @@ gradle/
 *.lock
 *.probe
 *.env
+gradle.properties
 build/
 !gradle/wrapper/gradle-wrapper.jar
 !**/src/main/**/build/
