@@ -10,6 +10,9 @@ spring:
     hibernate:
       ddl-auto: update
     show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
 google:
   oauth:
     client-id: 832116839355-48a8rih6jiq88so34mdd9s4apdfsqlkb.apps.googleusercontent.com
