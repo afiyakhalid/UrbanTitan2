@@ -3,6 +3,8 @@
 import React from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { type CategoryLink, allCategories } from "@/lib/constants";
+import { fetchCategories } from "@/lib/catalog";
+import Image from "next/image";
 
 function CategoryCard({ item }: { item: CategoryLink }) {
   return (
@@ -15,12 +17,18 @@ function CategoryCard({ item }: { item: CategoryLink }) {
       }}
       className="flex-shrink-0 w-[200px] md:w-[240px] text-center group"
     >
-      <div className="w-full h-[200px] overflow-hidden rounded-md transition duration-300 border border-gray-200 shadow-xs group-hover:shadow-lg">
-        <img
-          src={item.imageUrl}
-          alt={item.name}
-          className="w-full h-full object-cover transform group-hover:scale-105 transition duration-500"
-        />
+      <div className="relative w-full h-[200px] overflow-hidden rounded-md transition duration-300 border border-gray-200 shadow-xs group-hover:shadow-lg">
+        {item.imageUrl ? (
+          <Image
+            src={item.imageUrl}
+            alt={item.name}
+            fill
+            sizes="200px"
+            className="object-cover transform group-hover:scale-105 transition duration-500"
+          />
+        ) : (
+          <div className="w-full h-full bg-gray-100" />
+        )}
       </div>
 
       <p className="mt-3 text-sm md:text-[1.02rem] text-gray-800 font-medium">
@@ -31,7 +39,18 @@ function CategoryCard({ item }: { item: CategoryLink }) {
 }
 
 export function Categories() {
+  const [items, setItems] = React.useState<CategoryLink[]>(allCategories);
   const scrollRef = React.useRef<HTMLDivElement | null>(null);
+
+  React.useEffect(() => {
+    let cancelled = false;
+    fetchCategories().then((cats) => {
+      if (!cancelled) setItems(cats);
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   const scrollNext = () => {
     if (scrollRef.current) {
@@ -58,7 +77,7 @@ export function Categories() {
           ref={scrollRef}
           className="flex space-x-4 md:space-x-6 overflow-x-scroll scrollbar-hide pb-2 scroll-smooth"
         >
-          {allCategories.map((category) => (
+          {items.map((category) => (
             <CategoryCard key={category.name} item={category} />
           ))}
         </div>

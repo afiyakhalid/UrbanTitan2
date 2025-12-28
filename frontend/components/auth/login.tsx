@@ -1,10 +1,17 @@
 "use client";
 
 import React from "react";
+import { useRouter } from "next/navigation";
 import { apiFetch } from "@/lib/api";
 import { useAuthStore } from "@/store/auth";
 
-export function Login() {
+type LoginProps = {
+  googleClientId?: string;
+  onDismiss?: () => void;
+};
+
+export function Login({ googleClientId: googleClientIdProp, onDismiss }: LoginProps) {
+  const router = useRouter();
   const [email, setEmail] = React.useState<string>("");
   const [otp, setOtp] = React.useState<string>("");
   const [otpRequested, setOtpRequested] = React.useState<boolean>(false);
@@ -15,7 +22,8 @@ export function Login() {
 
   const { setToken } = useAuthStore();
 
-  const googleClientId = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID;
+  const googleClientId =
+    googleClientIdProp ?? process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID;
   const googleButtonRef = React.useRef<HTMLDivElement | null>(null);
 
   React.useEffect(() => {
@@ -126,12 +134,24 @@ export function Login() {
   const isSendOtpEnabled = isAgreed && email.includes("@") && !loading;
   const isVerifyOtpEnabled = otpRequested && otp.length === 6 && !loading;
 
+  const dismiss = () => {
+    if (onDismiss) {
+      onDismiss();
+      return;
+    }
+    if (typeof window !== "undefined" && window.history.length > 1) {
+      router.back();
+      return;
+    }
+    router.push("/");
+  };
+
   return (
     <div className="fixed bg-white inset-0 bg-opacity-60 flex items-center justify-center z-50 p-4">
       <div className="bg-white w-full max-w-sm rounded-xl shadow-2xl relative overflow-hidden animate-fadeIn">
         <button
           className="absolute top-4 right-4 text-gray-500 hover:text-gray-900 transition"
-          onClick={() => (window.location.href = "/")}
+          onClick={dismiss}
         >
           <svg
             className="w-6 h-6"
@@ -149,9 +169,9 @@ export function Login() {
         </button>
 
         <div className="flex flex-col items-center justify-center p-8 bg-orange-50/60">
-          <div className="text-5xl font-bold text-red-600 mb-2">tira</div>
+          <div className="text-4xl font-bold text-gray-900 mb-2">UrbanTitan</div>
           <p className="text-sm text-gray-700 font-light text-center">
-            Personalised beauty recommendations
+            where skill meets craft
           </p>
 
           <div className="h-32 w-full mt-4 flex justify-center items-center" />
@@ -197,7 +217,7 @@ export function Login() {
               htmlFor="agreement"
               className="text-xs text-gray-600 leading-relaxed"
             >
-              By continuing, you agree to Tira’s
+              By continuing, you agree to UrbanTitan&apos;s
               <a href="/terms" className="text-red-600 hover:underline mx-1">
                 Terms of Use
               </a>

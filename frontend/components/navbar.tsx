@@ -117,7 +117,7 @@ function DesktopCategory() {
     <div className="hidden sm:block bg-white relative z-40">
       <nav className="overflow-x-auto scrollbar-hide px-10 py-3">
         <ul className="flex flex-nowrap text-sm text-gray-700 whitespace-nowrap space-x-3">
-          {allCategories.map((category, index) => (
+          {(categories ?? allCategories).map((category, index) => (
             <li
               key={category.name}
               className="relative"

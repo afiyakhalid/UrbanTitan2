@@ -13,32 +13,6 @@ const policyLinks = [
   { name: "Promotions Terms & Conditions", href: "/promotions-terms" },
 ];
 
-const onlyOnTiraBrands = [
-  "KIKO Milano",
-  "Nails Our Way",
-  "Muzigae Mansion",
-  "Ahava",
-  "Augustinus Bader",
-  "Patchology",
-  "Allies Of Skin",
-  "9°Skin",
-  "82°E",
-  "Tira",
-];
-
-const popularBrands = [
-  "Beauty of Joseon",
-  "SKIN1004",
-  "Huda Beauty",
-  "FENTY BEAUTY",
-  "Laneige",
-  "M·A·C",
-  "COSRX",
-  "TIRTIR",
-  "Lakme",
-  "Minimalist",
-];
-
 const SocialIcon: React.FC<{ children: React.ReactNode; href: string }> = ({
   children,
   href,
