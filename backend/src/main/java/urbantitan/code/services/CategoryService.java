@@ -19,17 +19,26 @@ public class CategoryService {
     private final ModelMapper modelMapper;
 
     public List<CategoryResponseDTO> getAllCategories() {
-        return categoryRepository.findAll().stream().map(cat -> modelMapper.map(cat, CategoryResponseDTO.class)).toList();
+        return categoryRepository.findAllWithParent().stream().map(this::mapToResponseDTO).toList();
     }
 
     public CategoryResponseDTO getCategoryById(UUID id) {
-        Category category = categoryRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("Category not found with id: " + id));
-        return modelMapper.map(category, CategoryResponseDTO.class);
+        Category category = categoryRepository.findByIdWithParent(id).orElseThrow(() -> new IllegalArgumentException("Category not found with id: " + id));
+        return mapToResponseDTO(category);
     }
 
     public CategoryResponseDTO getCategoryBySlug(String slug) {
-        Category category = categoryRepository.findBySlug(slug).orElseThrow(() -> new IllegalArgumentException("Category not found with slug: " + slug));
-        return modelMapper.map(category, CategoryResponseDTO.class);
+        Category category = categoryRepository.findBySlugWithParent(slug).orElseThrow(() -> new IllegalArgumentException("Category not found with slug: " + slug));
+        return mapToResponseDTO(category);
+    }
+
+    private CategoryResponseDTO mapToResponseDTO(Category category) {
+        CategoryResponseDTO dto = modelMapper.map(category, CategoryResponseDTO.class);
+        // Manually set parent_id to handle lazy loading
+        if (category.getParent() != null) {
+            dto.setParent_id(category.getParent().getId());
+        }
+        return dto;
     }
 
     public CategoryResponseDTO createCategory(CategoryRequestDTO dto) {
@@ -45,7 +54,7 @@ public class CategoryService {
         Category category = modelMapper.map(dto, Category.class);
         Category saved = categoryRepository.save(category);
 
-        return modelMapper.map(saved, CategoryResponseDTO.class);
+        return mapToResponseDTO(saved);
     }
 
     public CategoryResponseDTO updatePartialCategory(UUID id, Map<String, Object> updates) {
@@ -95,7 +104,7 @@ public class CategoryService {
         });
 
         Category saved = categoryRepository.save(category);
-        return modelMapper.map(saved, CategoryResponseDTO.class);
+        return mapToResponseDTO(saved);
     }
 
     public void deleteCategory(UUID id) {
@@ -103,5 +112,9 @@ public class CategoryService {
             throw new IllegalArgumentException("Category not found with id: " + id);
         }
         categoryRepository.deleteById(id);
+    }
+
+    public boolean existsBySlug(String slug) {
+        return categoryRepository.existsBySlug(slug);
     }
 }

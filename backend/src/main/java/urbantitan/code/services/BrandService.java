@@ -78,4 +78,8 @@ public class BrandService {
         }
         brandRepository.deleteById(id);
     }
+
+    public boolean existsBySlug(String slug) {
+        return brandRepository.existsBySlug(slug);
+    }
 }

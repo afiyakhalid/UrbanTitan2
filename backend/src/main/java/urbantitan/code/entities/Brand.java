@@ -37,9 +37,6 @@ public class Brand {
     @Column(name = "logo_url", length = 255)
     private String logoUrl;
 
-    @Column(name = "image_url", length = 512)
-    private String imageUrl;
-
     @Column(name = "website_url", length = 255)
     private String websiteUrl;
 
