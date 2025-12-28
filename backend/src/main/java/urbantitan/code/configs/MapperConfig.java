@@ -9,6 +9,12 @@ public class MapperConfig {
     
     @Bean
     public ModelMapper modelMapper() {
-        return new ModelMapper();
+        ModelMapper modelMapper = new ModelMapper();
+        modelMapper.typeMap(urbantitan.code.entities.Category.class, urbantitan.code.dto.category.CategoryResponseDTO.class)
+            .addMappings(mapper -> mapper.map(
+                src -> src.getParent() != null ? src.getParent().getId() : null,
+                urbantitan.code.dto.category.CategoryResponseDTO::setParent_id
+            ));
+        return modelMapper;
     }
 }

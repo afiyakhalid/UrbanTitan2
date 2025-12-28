@@ -76,6 +76,20 @@ public class CategoryService {
 
                 case "isActive" -> category.setIsActive(value != null && Boolean.parseBoolean(value.toString()));
 
+                case "parent_id" -> {
+                    if (value == null) {
+                        category.setParent(null);
+                    } else {
+                        UUID parentId = UUID.fromString(value.toString());
+                        if (parentId.equals(category.getId())) {
+                            throw new IllegalArgumentException("Category cannot be its own parent");
+                        }
+                        Category parentCategory = categoryRepository.findById(parentId)
+                                .orElseThrow(() -> new IllegalArgumentException("Parent category not found with id: " + parentId));
+                        category.setParent(parentCategory);
+                    }
+                }
+
                 default -> throw new IllegalArgumentException("Field not allowed for update: " + field);
             }
         });

@@ -1,5 +1,6 @@
 package urbantitan.code.dto.category;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -19,6 +20,8 @@ public class CategoryResponseDTO {
     private String slug;
     private String description;
     private Boolean isActive;
+    @JsonProperty("parent_id")
+    private UUID parent_id;
     private OffsetDateTime createdAt;
     private OffsetDateTime updatedAt;
 }
