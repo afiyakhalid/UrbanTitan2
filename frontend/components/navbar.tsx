@@ -13,7 +13,7 @@ import {
   DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
 import { cn } from "@/lib/utils";
-import { type CategoryLink, allCategories } from "@/lib/constants";
+import { allCategories, Category } from "@/lib/constants";
 import { redirect } from "next/navigation";
 import { Badge } from "@/components/ui/badge";
 import { useCartStore } from "@/store/store";
@@ -48,8 +48,68 @@ const userLinks: UserLink[] = [
   { name: "Logout", href: "/logout", color: "text-red-400" },
 ];
 
+export interface CategoryLink {
+  name: string;
+  href: string;
+  slug: string;
+  children?: CategoryLink[];
+  imageUrl?: string;
+}
+
+function BuildCategoryTree({
+  categories,
+}: {
+  categories: Category[];
+}): CategoryLink[] {
+  const map = new Map<String, CategoryLink>();
+  const result: CategoryLink[] = [];
+
+  categories.forEach((cat) => {
+    map.set(cat.id, {
+      name: cat.name,
+      slug: cat.slug,
+      href: `/${cat.slug}`,
+      imageUrl: cat.imageUrl,
+      children: [],
+    });
+  });
+
+  categories.forEach((cat) => {
+    const node = map.get(cat.id) as CategoryLink;
+
+    if (cat.parent_id) {
+      const parent = map.get(cat.parent_id);
+      if (parent) {
+        parent.children?.push(node);
+      }
+    } else {
+      result.push(node);
+    }
+  });
+
+  return result;
+}
+
 function DesktopCategory() {
   const [openMenu, setOpenMenu] = React.useState<number | null>(null);
+  const [categories, setCategories] = React.useState<CategoryLink[] | null>(
+    null
+  );
+
+  React.useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const res = await fetch("http://localhost:8080/api/v1/categories/");
+        const data: Category[] = await res.json();
+        const updatedData = BuildCategoryTree({ categories: data });
+        setCategories(updatedData);
+      } catch (error) {
+        console.error("Error occured while fetching categories", error);
+      }
+    };
+
+    fetchData();
+  }, []);
 
   return (
     <div className="hidden sm:block bg-white relative z-40">

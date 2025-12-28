@@ -6,6 +6,18 @@ export interface CategoryLink {
   imageUrl?: string;
 }
 
+export interface Category {
+  id: string;
+  name: string;
+  slug: string;
+  description: string;
+  imageUrl: string;
+  isActive: boolean;
+  parent_id: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
 export const allCategories: CategoryLink[] = [
   {
     name: "Cement",
