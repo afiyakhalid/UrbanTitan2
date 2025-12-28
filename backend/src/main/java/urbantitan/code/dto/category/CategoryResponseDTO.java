@@ -19,6 +19,7 @@ public class CategoryResponseDTO {
     private String name;
     private String slug;
     private String description;
+    private String imageUrl;
     private Boolean isActive;
     @JsonProperty("parent_id")
     private UUID parent_id;

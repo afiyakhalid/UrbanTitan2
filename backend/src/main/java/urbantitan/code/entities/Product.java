@@ -38,8 +38,32 @@ public class Product {
     @Column(name = "description", nullable = false, length = 1024)
     private String description;
 
+    @Column(name = "volume", length = 100)
+    private String volume;
+
+    @Column(name = "product_code", length = 50)
+    private String productCode;
+
     @Column(name = "base_price", nullable = false)
     private BigDecimal basePrice;
+
+    @Column(name = "mrp")
+    private BigDecimal mrp;
+
+    @Column(name = "coupon_offer")
+    private Integer couponOffer;
+
+    @Column(name = "treats_points")
+    private Integer treatsPoints;
+
+    @Column(name = "rating", precision = 3, scale = 2)
+    private BigDecimal rating;
+
+    @Column(name = "review_count")
+    private Integer reviewCount;
+
+    @Column(name = "delivery_date", length = 100)
+    private String deliveryDate;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "brand_id", nullable = false, foreignKey = @ForeignKey(name = "fk_product_brand"))

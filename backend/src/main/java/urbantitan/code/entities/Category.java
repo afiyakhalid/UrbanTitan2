@@ -38,6 +38,9 @@ public class Category {
     @Column(name = "description", length = 1024)
     private String description;
 
+    @Column(name = "image_url", length = 512)
+    private String imageUrl;
+
     @Column(name = "is_active")
     private Boolean isActive = true;
 

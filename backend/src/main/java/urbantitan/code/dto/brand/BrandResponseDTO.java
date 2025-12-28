@@ -17,6 +17,7 @@ public class BrandResponseDTO {
     private String slug;
     private String description;
     private String logoUrl;
+    private String imageUrl;
     private String websiteUrl;
     private OffsetDateTime createdAt;
     private OffsetDateTime updatedAt;

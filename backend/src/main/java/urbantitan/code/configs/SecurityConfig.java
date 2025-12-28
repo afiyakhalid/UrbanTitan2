@@ -33,8 +33,8 @@ public class SecurityConfig {
                 .requestMatchers("/api/v1/categories/**").permitAll()
                 .requestMatchers("/api/v1/brands/**").permitAll()
                 .requestMatchers("/api/v1/products/**").permitAll()
-                // .anyRequest().authenticated()
-                .anyRequest().permitAll() // to be removed once front-end is integrated
+                 .anyRequest().authenticated() // Secure all other endpoints
+//                .anyRequest().permitAll()
             )
             .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
         return http.build();
