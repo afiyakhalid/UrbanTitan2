@@ -89,6 +89,13 @@ construction-marketplace/
 ```
 ---
 
+
+To Kill find the process in the port you run : the following command in terminal
+```d> netstat -ano | findstr :8080 
+```
+Then note the PID and run the following command
+```d> taskkill /PID <PID> /F 
+```
 ## 🧾 License
 This project is currently under proprietary development — © 2025 Uzair Hasan and Khadija Parveez.
 All rights reserved. Redistribution or reproduction without permission is prohibited.

@@ -20,6 +20,8 @@ import { useCartStore } from "@/store/store";
 import Image from "next/image";
 import Logo from "@/assets/images/logo.png";
 import Link from "next/link";
+import { getApiBaseUrl } from "@/lib/api";
+import { useAuthStore } from "@/store/auth";
 
 interface UserLink {
   name: string;
@@ -61,7 +63,7 @@ function BuildCategoryTree({
 }: {
   categories: Category[];
 }): CategoryLink[] {
-  const map = new Map<String, CategoryLink>();
+  const map = new Map<string, CategoryLink>();
   const result: CategoryLink[] = [];
 
   categories.forEach((cat) => {
@@ -99,7 +101,7 @@ function DesktopCategory() {
   React.useEffect(() => {
     const fetchData = async () => {
       try {
-        const res = await fetch("http://localhost:8080/api/v1/categories/");
+        const res = await fetch(`${getApiBaseUrl()}/api/v1/categories/`);
         const data: Category[] = await res.json();
         const updatedData = BuildCategoryTree({ categories: data });
         setCategories(updatedData);
@@ -271,6 +273,7 @@ function MobileCategory() {
 
 export function Header() {
   const { cart } = useCartStore();
+  const { user, logout } = useAuthStore();
 
   const [sidebarOpen, setSidebarOpen] = React.useState(false);
   const [profile, setProfile] = React.useState(false);
@@ -300,13 +303,20 @@ export function Header() {
               </span>
             </Link>
 
-            <div className="hidden sm:flex flex-col cursor-pointer group">
+            <div
+              className="hidden sm:flex flex-col cursor-pointer group"
+              onClick={() => {
+                if (!user) window.location.href = "/login";
+              }}
+            >
               <p className="text-sm text-gray-700">Welcome</p>
               <p className="font-medium text-gray-900 flex items-center">
-                Login/Sign Up
-                <span className="transition-transform group-hover:translate-x-0.5">
-                  &gt;
-                </span>
+                {user ? user.name : "Login/Sign Up"}
+                {!user && (
+                  <span className="transition-transform group-hover:translate-x-0.5">
+                    &gt;
+                  </span>
+                )}
               </p>
             </div>
           </div>
@@ -362,12 +372,18 @@ export function Header() {
                 </div>
               </DropdownMenuTrigger>
 
-              {userLinks.length > 0 && (
+              {user ? (
                 <DropdownMenuContent
                   className="w-max shadow-xs rounded-none rounded-b-lg mt-2"
                   align="end"
                   side="bottom"
                 >
+                  <div className="px-4 py-2 text-sm">
+                    <p className="font-medium text-gray-900">{user.name}</p>
+                    <p className="text-gray-600">{user.email}</p>
+                    <p className="text-gray-500 text-xs mt-0.5">ROLE_{user.role}</p>
+                  </div>
+                  <DropdownMenuSeparator />
                   {userLinks.map((link) => (
                     <div key={link.name}>
                       <DropdownMenuItem
@@ -375,7 +391,14 @@ export function Header() {
                           "cursor-pointer text-sm md:text-[1rem] px-4",
                           link.color
                         )}
-                        onClick={() => (window.location.href = link.href)}
+                        onClick={() => {
+                          if (link.name === "Logout") {
+                            logout();
+                            window.location.href = "/";
+                            return;
+                          }
+                          window.location.href = link.href;
+                        }}
                       >
                         {link.name}
                       </DropdownMenuItem>
@@ -383,6 +406,19 @@ export function Header() {
                       {link.separator && <DropdownMenuSeparator />}
                     </div>
                   ))}
+                </DropdownMenuContent>
+              ) : (
+                <DropdownMenuContent
+                  className="w-max shadow-xs rounded-none rounded-b-lg mt-2"
+                  align="end"
+                  side="bottom"
+                >
+                  <DropdownMenuItem
+                    className="cursor-pointer text-sm md:text-[1rem] px-4"
+                    onClick={() => (window.location.href = "/login")}
+                  >
+                    Login / Sign Up
+                  </DropdownMenuItem>
                 </DropdownMenuContent>
               )}
             </DropdownMenu>

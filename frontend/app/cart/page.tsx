@@ -3,6 +3,7 @@
 import { CartItemCard } from "@/components/cart/cart-card";
 import { OrderSummaryCard } from "@/components/cart/cart-summary";
 import { type CartItemType, useCartStore } from "@/store/store";
+import Link from "next/link";
 
 export interface OrderSummary {
   subtotal: number;
@@ -52,12 +53,12 @@ export default function Page() {
         <p className="text-[1.05rem] text-gray-600 mb-6">
           Looks like you haven’t added anything yet.
         </p>
-        <a
+        <Link
           href="/products"
           className="text-sm md:text-lg px-6 py-3 bg-black text-white rounded-md hover:bg-gray-900 transition"
         >
           Browse Products
-        </a>
+        </Link>
       </div>
     );
 

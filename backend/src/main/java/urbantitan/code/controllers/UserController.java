@@ -17,34 +17,51 @@ import lombok.RequiredArgsConstructor;
 import java.util.UUID;
 import java.util.List;
 import java.util.Map;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
+import urbantitan.code.security.AuthPrincipal;
 
 @RestController
 @RequestMapping("/api/v1/users")
 @RequiredArgsConstructor
 public class UserController {
     private final UserService userService;
+
+    @GetMapping("/me")
+    public ResponseEntity<UserResponseDTO> getMe(Authentication authentication) {
+        Object principalObj = authentication != null ? authentication.getPrincipal() : null;
+        if (!(principalObj instanceof AuthPrincipal principal)) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+        return ResponseEntity.status(HttpStatus.OK).body(userService.getUserById(principal.userId()));
+    }
     
     @GetMapping("/")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<List<UserResponseDTO>> getAllUsers() {
         return ResponseEntity.status(HttpStatus.OK).body(userService.getAllUsers());
     }
 
     @GetMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<UserResponseDTO> getUserById(@PathVariable UUID id) {
         return ResponseEntity.status(HttpStatus.OK).body(userService.getUserById(id));
     }
 
     @PostMapping("/")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<UserResponseDTO> createUser(@RequestBody UserRequestDTO userRequest) {
         return ResponseEntity.status(HttpStatus.CREATED).body(userService.createUser(userRequest));
     }
 
     @PatchMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<UserResponseDTO> updatePartialUser(@PathVariable UUID id, @RequestBody Map<String, Object> updates) {
         return ResponseEntity.status(HttpStatus.OK).body(userService.updatePartialUser(id, updates));
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Void> deleteUserById(@PathVariable UUID id) {
         userService.deleteUserById(id);
         return ResponseEntity.noContent().build();

@@ -241,7 +241,7 @@ export function ProductDetails({ product }: { product: ProductType }) {
       <div className="my-6">
         <AccordionItem title="Special Features">
           <p className="text-[1rem]">
-            Details about product's special features.
+            Details about product&apos;s special features.
           </p>
         </AccordionItem>
 

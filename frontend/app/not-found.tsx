@@ -14,7 +14,7 @@ export default function NotFound() {
       </h1>
 
       <p className="mt-4 text-gray-600 text-center max-w-md text-base md:text-lg">
-        This section is currently under development. We're working hard to bring
+        This section is currently under development. We&apos;re working hard to bring
         this feature live as soon as possible.
       </p>
 
