@@ -18,6 +18,7 @@ public class CategoryResponseDTO {
     private String name;
     private String slug;
     private String description;
+    private String imageUrl;
     private Boolean isActive;
     private OffsetDateTime createdAt;
     private OffsetDateTime updatedAt;
