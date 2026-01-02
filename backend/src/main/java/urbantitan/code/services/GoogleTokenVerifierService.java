@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.util.Collections;
+import java.util.List;
 
 @Service
 public class GoogleTokenVerifierService {
@@ -20,6 +21,7 @@ public class GoogleTokenVerifierService {
                 GsonFactory.getDefaultInstance()
                 )
                 .setAudience(Collections.singletonList(clientId))
+        .setIssuers(List.of("accounts.google.com", "https://accounts.google.com"))
                 .build();
     }
 

@@ -47,22 +47,6 @@ const ReturnIcon = () => (
   </svg>
 );
 
-const InfoIcon = () => (
-  <svg
-    className="w-4 h-4 ml-1 text-gray-500"
-    fill="none"
-    stroke="currentColor"
-    viewBox="0 0 24 24"
-  >
-    <path
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      strokeWidth="2"
-      d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-    ></path>
-  </svg>
-);
-
 function AccordionItem({
   title,
   children,
@@ -95,7 +79,7 @@ function AccordionItem({
 export function ProductDetails({ product }: { product: ProductType }) {
   const { addToCart } = useCartStore();
   const [selectedSize, setSelectedSize] = React.useState(
-    product.details.sizes[1]
+    product.details.sizes[0]
   );
 
   const handleCompare = (cat: string) => {
@@ -241,7 +225,7 @@ export function ProductDetails({ product }: { product: ProductType }) {
       <div className="my-6">
         <AccordionItem title="Special Features">
           <p className="text-[1rem]">
-            Details about product's special features.
+            Details about product&apos;s special features.
           </p>
         </AccordionItem>
 

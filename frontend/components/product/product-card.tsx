@@ -4,6 +4,7 @@ import Link from "next/link";
 import { type Product as ProductType } from "@/lib/data";
 import { Star } from "lucide-react";
 import { cn } from "@/lib/utils";
+import Image from "next/image";
 
 export function ProductCard({
   item,
@@ -21,12 +22,18 @@ export function ProductCard({
       )}
     >
       {/* Image */}
-      <div className="w-full h-56 md:h-64 overflow-hidden">
-        <img
-          src={item.images[0]}
-          alt={item.details.name}
-          className="w-full h-full object-contain p-4 transform group-hover:scale-105 transition duration-500"
-        />
+      <div className="relative w-full h-56 md:h-64 overflow-hidden">
+        {item.images?.[0] ? (
+          <Image
+            src={item.images[0]}
+            alt={item.details.name}
+            fill
+            sizes={widthAutoTake ? "100vw" : "(max-width: 768px) 100vw, 300px"}
+            className="object-contain p-4 transform group-hover:scale-105 transition duration-500"
+          />
+        ) : (
+          <div className="w-full h-full bg-gray-50" />
+        )}
       </div>
 
       {/* Content */}

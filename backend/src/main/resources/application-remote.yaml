@@ -1,13 +1,56 @@
 spring:
   datasource:
-    url: jdbc:postgresql://db.kkhjaydeatcawfjtjvjk.supabase.co:5432/postgres
-    username: postgres
-    password: Gussail2annoyed@53
+    url: ${DB_URL}
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
     driver-class-name: org.postgresql.Driver
+    hikari:
+      maximum-pool-size: 10
+      minimum-idle: 2
+      connection-timeout: 20000
   jpa:
     hibernate:
       ddl-auto: validate
     show-sql: false
+    properties:
+      hibernate:
+        jdbc:
+          time_zone: UTC
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+  endpoint:
+    health:
+      show-details: never
+      probes:
+        enabled: true
+  health:
+    livenessState:
+      enabled: true
+    readinessState:
+      enabled: true
+
+logging:
+  level:
+    root: INFO
+    urbantitan.code: INFO
+    org.springframework.web: INFO
+    org.hibernate: WARN
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} - %msg%n"
+
 google:
   oauth:
-    client-id: 832116839355-48a8rih6jiq88so34mdd9s4apdfsqlkb.apps.googleusercontent.com
+    client-id: ${GOOGLE_OAUTH_CLIENT_ID}
+
+security:
+  jwt:
+    secret: ${JWT_SECRET}
+    issuer: urbantitan
+    expiry-seconds: 604800
+  otp:
+    expiry-seconds: 300
+    debug-return: false

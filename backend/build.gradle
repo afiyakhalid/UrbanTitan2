@@ -22,11 +22,19 @@ configurations {
 
 tasks.register('runApplication') {
     group = 'application'
-    description = 'Runs bootRun while skipping tests (equivalent to `./gradlew bootRun -x test`)'
+    description = 'Runs bootRun while skipping tests (equivalent to `./gradlew bootRun`)'
     doFirst {
         tasks.withType(Test).configureEach { enabled = false }
     }
     dependsOn 'bootRun'
+}
+
+tasks.register('localRun') {
+    group = 'application'
+    description = 'Runs bootRun with remote configs (equivalent to `./gradlew test bootRun`)'
+    doFirst{
+        tasks.withType(Test).configureEach { enabled = false }
+    }
 }
 
 
@@ -66,4 +74,24 @@ tasks.named('test') {
 test {
     // Disable running tests during build
     enabled = false
+}
+
+// Load .env file for bootRun task
+bootRun {
+    def envFile = file('.env')
+    if (envFile.exists()) {
+        envFile.readLines().each { line ->
+            def trimmedLine = line.trim()
+            if (trimmedLine && !trimmedLine.startsWith('#')) {
+                def (key, value) = trimmedLine.split('=', 2)
+                if (key && value) {
+                    systemProperty key.trim(), value.trim()
+                    environment key.trim(), value.trim()
+                }
+            }
+        }
+        println "✅ Loaded environment variables from .env file"
+    } else {
+        println "⚠️ WARNING: .env file not found! Copy .env.example to .env and configure it."
+    }
 }

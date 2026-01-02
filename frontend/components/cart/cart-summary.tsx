@@ -2,8 +2,11 @@
 
 import { type OrderSummary } from "@/app/cart/page";
 import { ChevronRight } from "lucide-react";
+import { useAuthStore, requireRole } from "@/store/auth";
 
 export function OrderSummaryCard({ summary }: { summary: OrderSummary }) {
+  const { user } = useAuthStore();
+
   return (
     <div className="p-6 bg-gray-50 rounded-xl shadow-md">
       <h2 className="text-xl font-normal mb-6">Order Summary</h2>
@@ -43,7 +46,20 @@ export function OrderSummaryCard({ summary }: { summary: OrderSummary }) {
       </div>
 
       {/* Checkout Button */}
-      <button className="flex items-center gap-2 w-full bg-black text-white py-3.5 font-semibold rounded-full text-lg flex items-center justify-center hover:bg-gray-800 hover:cursor-pointer transition duration-150 shadow-lg">
+      <button
+        onClick={() => {
+          if (!user) {
+            window.location.href = "/login";
+            return;
+          }
+          if (!requireRole(user.role, ["USER"])) {
+            alert("You need USER role to place an order.");
+            return;
+          }
+          window.location.href = "/checkout";
+        }}
+        className="flex items-center gap-2 w-full bg-black text-white py-3.5 font-semibold rounded-full text-lg flex items-center justify-center hover:bg-gray-800 hover:cursor-pointer transition duration-150 shadow-lg"
+      >
         <span>Go to Checkout</span>
         <ChevronRight className="w-6 h-6" />
       </button>

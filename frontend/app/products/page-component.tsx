@@ -3,13 +3,9 @@
 import React from "react";
 import { SlidersHorizontal, X } from "lucide-react";
 import { FilterSection } from "@/components/filter/filter-section";
-import {
-  allBrands,
-  Brand,
-  type CategoryLink,
-  allCategories,
-} from "@/lib/constants";
-import { productData, type Product as ProductType } from "@/lib/data";
+import { Brand, type CategoryLink } from "@/lib/constants";
+import { type Product as ProductType } from "@/lib/data";
+import { fetchBrands, fetchCategories, fetchProducts } from "@/lib/catalog";
 import { ProductCard } from "@/components/product/product-card";
 import {
   useQueryState,
@@ -21,6 +17,10 @@ import { CategoryDropdown } from "@/components/filter/category-dropdown";
 
 export function PageComponent() {
   const [open, setOpen] = React.useState<boolean>(false);
+
+  const [allProducts, setAllProducts] = React.useState<ProductType[]>([]);
+  const [allCats, setAllCats] = React.useState<CategoryLink[]>([]);
+  const [allBrandItems, setAllBrandItems] = React.useState<Brand[]>([]);
 
   const [filteredProducts, setFilteredProducts] = React.useState<
     ProductType[] | null
@@ -38,7 +38,7 @@ export function PageComponent() {
 
   const [priceRange, setPriceRange] = useQueryState(
     "price",
-    parseAsArrayOf(parseAsInteger).withDefault([0, 2000])
+    parseAsArrayOf(parseAsInteger).withDefault([0, 1000000])
   );
 
   const [discount, setDiscount] = useQueryState(
@@ -66,7 +66,27 @@ export function PageComponent() {
   };
 
   React.useEffect(() => {
-    const newProducts = productData.filter((p) => {
+    let cancelled = false;
+    (async () => {
+      const [products, cats, brandsList] = await Promise.all([
+        fetchProducts(),
+        fetchCategories(),
+        fetchBrands(),
+      ]);
+      if (cancelled) return;
+      setAllProducts(products);
+      setAllCats(cats);
+      setAllBrandItems(brandsList);
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  React.useEffect(() => {
+    const source = allProducts.length > 0 ? allProducts : [];
+
+    const newProducts = source.filter((p) => {
       const inPriceRange =
         p.details.price >= priceRange[0] && p.details.price <= priceRange[1];
 
@@ -84,7 +104,7 @@ export function PageComponent() {
     });
 
     setFilteredProducts(newProducts);
-  }, [priceRange, discount, brands, categories]);
+  }, [allProducts, priceRange, discount, brands, categories]);
 
   return (
     <div className="w-full flex flex-col md:flex-row md:gap-6 max-w-8xl mx-auto px-12 py-8">
@@ -127,7 +147,7 @@ export function PageComponent() {
           {/* Category Filter */}
           <FilterSection title="Category">
             <div className="space-y-2">
-              {allCategories.map((cat: CategoryLink) => (
+              {allCats.map((cat: CategoryLink) => (
                 <CategoryDropdown
                   key={cat.slug}
                   category={cat}
@@ -141,7 +161,7 @@ export function PageComponent() {
           {/* Brand Filter */}
           <FilterSection title="Brand">
             <div className="space-y-2">
-              {allBrands.map((brand: Brand) => (
+              {allBrandItems.map((brand: Brand) => (
                 <label
                   key={brand.slug}
                   className="flex items-center gap-2 text-md"
@@ -162,7 +182,7 @@ export function PageComponent() {
             <input
               type="range"
               min={0}
-              max={2000}
+              max={1000000}
               value={priceRange[1]}
               onChange={(e) => setPriceRange([0, Number(e.target.value)])}
               className="w-full"

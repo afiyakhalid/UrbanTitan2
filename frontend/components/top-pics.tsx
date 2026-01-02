@@ -1,23 +1,29 @@
 "use client";
 
 import { productData, type Product as ProductType } from "@/lib/data";
+import { fetchProducts } from "@/lib/catalog";
 import { ChevronLeft, ChevronRight, Star } from "lucide-react";
 import React from "react";
+import Image from "next/image";
 
-// --- Sample Data ---
-const topShelfs: ProductType[] = productData.filter(
-  (p) => Number(p.id) >= 107 && Number(p.id) <= 110
-);
+// --- Initial sample data (will be replaced by API fetch) ---
+const initialTopShelfs: ProductType[] = productData.slice(6, 10);
 
 function TopShelfCard({ product }: { product: ProductType }) {
   return (
     <div className="flex-shrink-0 w-[300px] md:w-[350px] bg-white rounded-md overflow-hidden border border-gray-100 shadow-xs group">
       <div className="w-full h-[300px] relative overflow-hidden">
-        <img
-          src={product.images[0]}
-          alt={product.details.name}
-          className="w-full h-full object-contain"
-        />
+        {product.images?.[0] ? (
+          <Image
+            src={product.images[0]}
+            alt={product.details.name}
+            fill
+            sizes="(max-width: 768px) 100vw, 350px"
+            className="object-contain"
+          />
+        ) : (
+          <div className="w-full h-full bg-gray-50" />
+        )}
       </div>
 
       <div className="px-3 py-4 space-y-2 border-t border-gray-100">
@@ -57,7 +63,20 @@ function TopShelfCard({ product }: { product: ProductType }) {
 }
 
 export function TopShelf() {
+  const [topShelfs, setTopShelfs] = React.useState<ProductType[]>(initialTopShelfs);
   const scrollRef = React.useRef<HTMLDivElement | null>(null);
+
+  React.useEffect(() => {
+    let cancelled = false;
+    fetchProducts().then((products) => {
+      if (!cancelled && products.length > 0) {
+        setTopShelfs(products.slice(6, 10));
+      }
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   const scrollNext = () => {
     if (scrollRef.current) {

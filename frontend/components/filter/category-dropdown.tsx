@@ -14,9 +14,6 @@ export function CategoryDropdown({
   const [open, setOpen] = React.useState(false);
 
   const hasChildren = category.children && category.children.length > 0;
-  const childrenSlugs = hasChildren
-    ? category.children!.map((c) => c.slug)
-    : [];
 
   return (
     <div className="border rounded-md p-2">

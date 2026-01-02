@@ -38,12 +38,24 @@ public class ProductConfig {
         responseMap.addMappings(m -> {
             m.map(src -> src.getBrand().getId(), ProductResponseDTO::setBrandId);
             m.map(src -> src.getCategory().getId(), ProductResponseDTO::setCategoryId);
+            m.map(src -> src.getBrand().getName(), ProductResponseDTO::setBrandName);
+            m.map(src -> src.getBrand().getSlug(), ProductResponseDTO::setBrandSlug);
+            m.map(src -> src.getCategory().getName(), ProductResponseDTO::setCategoryName);
+            m.map(src -> src.getCategory().getSlug(), ProductResponseDTO::setCategorySlug);
 
             m.map(Product::getId, ProductResponseDTO::setId);
             m.map(Product::getName, ProductResponseDTO::setName);
             m.map(Product::getSlug, ProductResponseDTO::setSlug);
             m.map(Product::getDescription, ProductResponseDTO::setDescription);
+            m.map(Product::getVolume, ProductResponseDTO::setVolume);
+            m.map(Product::getProductCode, ProductResponseDTO::setProductCode);
             m.map(Product::getBasePrice, ProductResponseDTO::setBasePrice);
+            m.map(Product::getMrp, ProductResponseDTO::setMrp);
+            m.map(Product::getCouponOffer, ProductResponseDTO::setCouponOffer);
+            m.map(Product::getTreatsPoints, ProductResponseDTO::setTreatsPoints);
+            m.map(Product::getRating, ProductResponseDTO::setRating);
+            m.map(Product::getReviewCount, ProductResponseDTO::setReviewCount);
+            m.map(Product::getDeliveryDate, ProductResponseDTO::setDeliveryDate);
             m.map(Product::getIsActive, ProductResponseDTO::setIsActive);
             m.map(Product::getPrimaryImageUrl, ProductResponseDTO::setPrimaryImageUrl);
             m.map(Product::getCreatedAt, ProductResponseDTO::setCreatedAt);

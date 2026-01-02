@@ -59,10 +59,14 @@ export function Hero() {
             <div className="w-full h-full mx-auto flex flex-col lg:flex-row items-center justify-between">
               <div className="w-full h-full relative flex justify-center lg:justify-end mt-10 lg:mt-0">
                 <div className="relative w-full h-full overflow-hidden  ">
-                  <img
+                  <Image
                     src={item.image}
                     alt={item.title}
-                    className="w-full h-full object-contain"
+                    width={1200}
+                    height={600}
+                    sizes="100vw"
+                    className="w-full h-auto object-contain"
+                    priority={index === 0}
                   />
                 </div>
               </div>

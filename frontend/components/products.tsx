@@ -1,16 +1,26 @@
 "use client";
 
 import { productData, type Product as ProductType } from "@/lib/data";
+import { fetchProducts } from "@/lib/catalog";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { ProductCard } from "@/components/product/product-card";
 import React from "react";
 
-const productItems: ProductType[] = productData.filter(
-  (p) => Number(p.id) >= 101 && Number(p.id) <= 106
-);
-
 export function Products() {
+  const [items, setItems] = React.useState<ProductType[]>(
+    productData.slice(0, 6)
+  );
   const scrollRef = React.useRef<HTMLDivElement | null>(null);
+
+  React.useEffect(() => {
+    let cancelled = false;
+    fetchProducts().then((products) => {
+      if (!cancelled && products.length > 0) setItems(products.slice(0, 6));
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   const scrollNext = () => {
     if (scrollRef.current) {
@@ -35,9 +45,9 @@ export function Products() {
           ref={scrollRef}
           className="flex space-x-4 md:space-x-6 overflow-x-scroll scrollbar-hide pb-2 scroll-smooth"
         >
-          {productItems &&
-            productItems.length > 0 &&
-            productItems.map((product) => (
+          {items &&
+            items.length > 0 &&
+            items.map((product) => (
               <ProductCard key={product.id} item={product} />
             ))}
         </div>

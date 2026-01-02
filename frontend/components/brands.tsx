@@ -1,17 +1,24 @@
 "use client";
 
+import React from "react";
 import { type Brand, allBrands } from "@/lib/constants";
+import { fetchBrands } from "@/lib/catalog";
 import { ChevronRight } from "lucide-react";
+import Image from "next/image";
 
 function BrandCard({ brand }: { brand: Brand }) {
+  if (!brand.imageUrl) return null;
+
   return (
     <div className="cursor-pointer w-full max-w-sm bg-white rounded-md shadow-sm border border-gray-200 overflow-hidden group transition-all duration-300 hover:shadow-md">
       {/* Image Section */}
-      <div className="w-full h-56 md:h-64 overflow-hidden bg-gray-50 flex items-center justify-center">
-        <img
+      <div className="relative w-full h-56 md:h-64 overflow-hidden bg-gray-50 flex items-center justify-center">
+        <Image
           src={brand.imageUrl}
-          alt={brand.slug}
-          className="w-full h-full object-contain transform transition-all duration-500 group-hover:scale-105"
+          alt={brand.name}
+          fill
+          sizes="(max-width: 768px) 100vw, 320px"
+          className="object-contain transform transition-all duration-500 group-hover:scale-105"
         />
       </div>
 
@@ -41,6 +48,18 @@ function BrandCard({ brand }: { brand: Brand }) {
 }
 
 export function Brands() {
+  const [items, setItems] = React.useState<Brand[]>(allBrands);
+
+  React.useEffect(() => {
+    let cancelled = false;
+    fetchBrands().then((brands) => {
+      if (!cancelled) setItems(brands);
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
   return (
     <section className="bg-gray-50 mt-8 py-12 pb-18 px-8">
       <div className="max-w-7xl mx-auto">
@@ -49,7 +68,7 @@ export function Brands() {
         </h2>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 justify-items-center">
-          {allBrands
+          {items
             .filter((brand) => brand.imageUrl)
             .map((brand, index) => (
               <BrandCard key={index} brand={brand} />

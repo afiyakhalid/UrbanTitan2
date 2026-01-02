@@ -13,13 +13,15 @@ import {
   DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
 import { cn } from "@/lib/utils";
-import { type CategoryLink, allCategories } from "@/lib/constants";
+import { allCategories, Category } from "@/lib/constants";
 import { redirect } from "next/navigation";
 import { Badge } from "@/components/ui/badge";
 import { useCartStore } from "@/store/store";
 import Image from "next/image";
 import Logo from "@/assets/images/logo.png";
 import Link from "next/link";
+import { getApiBaseUrl } from "@/lib/api";
+import { useAuthStore } from "@/store/auth";
 
 interface UserLink {
   name: string;
@@ -48,14 +50,74 @@ const userLinks: UserLink[] = [
   { name: "Logout", href: "/logout", color: "text-red-400" },
 ];
 
+export interface CategoryLink {
+  name: string;
+  href: string;
+  slug: string;
+  children?: CategoryLink[];
+  imageUrl?: string;
+}
+
+function BuildCategoryTree({
+  categories,
+}: {
+  categories: Category[];
+}): CategoryLink[] {
+  const map = new Map<string, CategoryLink>();
+  const result: CategoryLink[] = [];
+
+  categories.forEach((cat) => {
+    map.set(cat.id, {
+      name: cat.name,
+      slug: cat.slug,
+      href: `/${cat.slug}`,
+      imageUrl: cat.imageUrl,
+      children: [],
+    });
+  });
+
+  categories.forEach((cat) => {
+    const node = map.get(cat.id) as CategoryLink;
+
+    if (cat.parent_id) {
+      const parent = map.get(cat.parent_id);
+      if (parent) {
+        parent.children?.push(node);
+      }
+    } else {
+      result.push(node);
+    }
+  });
+
+  return result;
+}
+
 function DesktopCategory() {
   const [openMenu, setOpenMenu] = React.useState<number | null>(null);
+  const [categories, setCategories] = React.useState<CategoryLink[] | null>(
+    null
+  );
+
+  React.useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const res = await fetch(`${getApiBaseUrl()}/api/v1/categories/`);
+        const data: Category[] = await res.json();
+        const updatedData = BuildCategoryTree({ categories: data });
+        setCategories(updatedData);
+      } catch (error) {
+        console.error("Error occured while fetching categories", error);
+      }
+    };
+
+    fetchData();
+  }, []);
 
   return (
     <div className="hidden sm:block bg-white relative z-40">
       <nav className="overflow-x-auto scrollbar-hide px-10 py-3">
         <ul className="flex flex-nowrap text-sm text-gray-700 whitespace-nowrap space-x-3">
-          {allCategories.map((category, index) => (
+          {(categories ?? allCategories).map((category, index) => (
             <li
               key={category.name}
               className="relative"
@@ -211,6 +273,7 @@ function MobileCategory() {
 
 export function Header() {
   const { cart } = useCartStore();
+  const { user, logout } = useAuthStore();
 
   const [sidebarOpen, setSidebarOpen] = React.useState(false);
   const [profile, setProfile] = React.useState(false);
@@ -240,13 +303,20 @@ export function Header() {
               </span>
             </Link>
 
-            <div className="hidden sm:flex flex-col cursor-pointer group">
+            <div
+              className="hidden sm:flex flex-col cursor-pointer group"
+              onClick={() => {
+                if (!user) window.location.href = "/login";
+              }}
+            >
               <p className="text-sm text-gray-700">Welcome</p>
               <p className="font-medium text-gray-900 flex items-center">
-                Login/Sign Up
-                <span className="transition-transform group-hover:translate-x-0.5">
-                  &gt;
-                </span>
+                {user ? user.name : "Login/Sign Up"}
+                {!user && (
+                  <span className="transition-transform group-hover:translate-x-0.5">
+                    &gt;
+                  </span>
+                )}
               </p>
             </div>
           </div>
@@ -302,12 +372,18 @@ export function Header() {
                 </div>
               </DropdownMenuTrigger>
 
-              {userLinks.length > 0 && (
+              {user ? (
                 <DropdownMenuContent
                   className="w-max shadow-xs rounded-none rounded-b-lg mt-2"
                   align="end"
                   side="bottom"
                 >
+                  <div className="px-4 py-2 text-sm">
+                    <p className="font-medium text-gray-900">{user.name}</p>
+                    <p className="text-gray-600">{user.email}</p>
+                    <p className="text-gray-500 text-xs mt-0.5">ROLE_{user.role}</p>
+                  </div>
+                  <DropdownMenuSeparator />
                   {userLinks.map((link) => (
                     <div key={link.name}>
                       <DropdownMenuItem
@@ -315,7 +391,14 @@ export function Header() {
                           "cursor-pointer text-sm md:text-[1rem] px-4",
                           link.color
                         )}
-                        onClick={() => (window.location.href = link.href)}
+                        onClick={() => {
+                          if (link.name === "Logout") {
+                            logout();
+                            window.location.href = "/";
+                            return;
+                          }
+                          window.location.href = link.href;
+                        }}
                       >
                         {link.name}
                       </DropdownMenuItem>
@@ -323,6 +406,19 @@ export function Header() {
                       {link.separator && <DropdownMenuSeparator />}
                     </div>
                   ))}
+                </DropdownMenuContent>
+              ) : (
+                <DropdownMenuContent
+                  className="w-max shadow-xs rounded-none rounded-b-lg mt-2"
+                  align="end"
+                  side="bottom"
+                >
+                  <DropdownMenuItem
+                    className="cursor-pointer text-sm md:text-[1rem] px-4"
+                    onClick={() => (window.location.href = "/login")}
+                  >
+                    Login / Sign Up
+                  </DropdownMenuItem>
                 </DropdownMenuContent>
               )}
             </DropdownMenu>
