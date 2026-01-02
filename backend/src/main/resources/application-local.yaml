@@ -2,9 +2,9 @@ spring:
   application:
     name: UrbanTitan
   datasource:
-    url: jdbc:postgresql://localhost:5432/UrbanTitan
-    username: khadiuzz
-    password: Tawakkul
+    url: ${DB_URL:jdbc:postgresql://localhost:5432/urbantitan}
+    username: ${DB_USERNAME:postgres}
+    password: ${DB_PASSWORD:postgres}
     driver-class-name: org.postgresql.Driver
   jpa:
     hibernate:
@@ -13,14 +13,23 @@ spring:
     properties:
       hibernate:
         format_sql: true
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+  endpoint:
+    health:
+      show-details: when-authorized
+
 google:
   oauth:
-    client-id: 295048428402-lg2fc2kgke8fk6kc0iscqm9ia5qq390t.apps.googleusercontent.com
+    client-id: ${GOOGLE_OAUTH_CLIENT_ID}
 
 security:
   jwt:
-    # Override in prod with env var JWT_SECRET
-    secret: ${JWT_SECRET:KHJADFIJAGI8LOHVEDOYOUFKTHISJSHGUYGFISICRAZYUWABOUTEHYOUFI&UZIA&SIRWEHFIUWEHFIUWEHFIUWEHFIUWEHF}
+    secret: ${JWT_SECRET}
     issuer: urbantitan
     expiry-seconds: 604800
   otp:

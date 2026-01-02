@@ -8,7 +8,10 @@ gradle/
 *.bin
 *.lock
 *.probe
+.env
+.env.local
 *.env
+!.env.example
 gradle.properties
 build/
 !gradle/wrapper/gradle-wrapper.jar

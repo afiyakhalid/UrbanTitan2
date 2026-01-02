@@ -55,11 +55,20 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(Arrays.asList(
-                "http://localhost:3000",
-                "https://urbantitan.in",
-                "https://urbantitan.vercel.in"
-        ));
+        String rawAllowedOrigins = System.getenv("CORS_ALLOWED_ORIGINS");
+        if (rawAllowedOrigins != null && !rawAllowedOrigins.trim().isEmpty()) {
+            List<String> origins = Arrays.stream(rawAllowedOrigins.split(","))
+                    .map(String::trim)
+                    .filter(s -> !s.isEmpty())
+                    .toList();
+            configuration.setAllowedOrigins(origins);
+        } else {
+            configuration.setAllowedOrigins(Arrays.asList(
+                    "http://localhost:3000",
+                    "https://urbantitan.in",
+                    "https://urbantitan.vercel.in"
+            ));
+        }
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));
         configuration.setAllowedHeaders(List.of("*"));
         configuration.setAllowCredentials(true);
