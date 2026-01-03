@@ -1,6 +1,5 @@
 package urbantitan.code.repositories;
 
-import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import urbantitan.code.entities.User;

@@ -45,6 +45,7 @@ logging:
 google:
   oauth:
     client-id: ${GOOGLE_OAUTH_CLIENT_ID}
+    client-secret: ${GOOGLE_OAUTH_CLIENT_SECRET}
 
 security:
   jwt:
