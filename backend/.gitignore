@@ -4,7 +4,6 @@
 *.xml
 *.jar
 *.docx
-*.properties
 *.bin
 *.lock
 *.probe
