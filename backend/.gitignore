@@ -1,10 +1,9 @@
 .idea/
-gradle/
+.gradle/
 *.log
 *.xml
 *.jar
 *.docx
-*.properties
 *.bin
 *.lock
 *.probe
