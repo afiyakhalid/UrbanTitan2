@@ -6,7 +6,7 @@ This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-
 
 Create `frontend/.env.local` (you can copy `frontend/.env.example`) and set:
 
-- `NEXT_PUBLIC_API_BASE_URL` (example: `http://localhost:8080`)
+- `NEXT_PUBLIC_API_BASE_URL` (required - your backend URL, e.g., `https://urbantitan-backend-295048428402.asia-south1.run.app`)
 - `NEXT_PUBLIC_GOOGLE_CLIENT_ID` (recommended) or `GOOGLE_CLIENT_ID`
 
 First, run the development server:

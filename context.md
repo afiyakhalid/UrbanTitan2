@@ -197,7 +197,7 @@ This keeps filters shareable via URL.
 ### 5.6 Data sources (current state)
 
 - Many UI pages use local mock data from `frontend/lib/data.ts`.
-- Some components fetch from backend directly (example in navbar fetches categories from `http://localhost:8080/api/v1/categories/`).
+- Some components fetch from backend directly (example in navbar fetches categories from `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1/categories/`).
 
 **Recommended convention for new code:**
 - Centralize API calls behind a small client (e.g., one module in `lib/`), and use an env var for the API base URL (e.g., `NEXT_PUBLIC_API_BASE_URL`) instead of hard-coding URLs.
