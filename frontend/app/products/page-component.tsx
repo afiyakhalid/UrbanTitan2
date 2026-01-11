@@ -46,6 +46,11 @@ export function PageComponent() {
     parseAsInteger.withDefault(0)
   );
 
+  const [search] = useQueryState(
+    "search",
+    parseAsString.withDefault("")
+  );
+
   const handleCategoryChange = (slug: string) => {
     let updated = [...categories];
 
@@ -99,12 +104,19 @@ export function PageComponent() {
 
       const meetsBrand =
         brands.length > 0 ? brands.includes(p.details.brand.slug) : true;
+      
+      const param = search?.toLowerCase() || "";
+      const meetsSearch = 
+        !param || 
+        p.details.name.toLowerCase().includes(param) ||
+        p.details.brand.name.toLowerCase().includes(param) ||
+        p.details.category.name.toLowerCase().includes(param);
 
-      return inPriceRange && meetsDiscount && meetsCategory && meetsBrand;
+      return inPriceRange && meetsDiscount && meetsCategory && meetsBrand && meetsSearch;
     });
 
     setFilteredProducts(newProducts);
-  }, [allProducts, priceRange, discount, brands, categories]);
+  }, [allProducts, priceRange, discount, brands, categories, search]);
 
   return (
     <div className="w-full flex flex-col md:flex-row md:gap-6 max-w-8xl mx-auto px-12 py-8">

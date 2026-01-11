@@ -35,6 +35,11 @@ public class BrandController {
         return ResponseEntity.ok(brandService.getBrandById(id));
     }
 
+    @GetMapping("/slug/{slug}")
+    public ResponseEntity<BrandResponseDTO> getBrandBySlug(@PathVariable String slug) {
+        return ResponseEntity.ok(brandService.getBrandBySlug(slug));
+    }
+
     @PatchMapping("/{id}")
     public ResponseEntity<BrandResponseDTO> updatePartialBrand(@PathVariable UUID id, @RequestBody Map<String, Object> updates) {
         return ResponseEntity.status(HttpStatus.OK).body(brandService.updatePartialBrand(id, updates));

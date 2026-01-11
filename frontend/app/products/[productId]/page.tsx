@@ -9,9 +9,9 @@ import React from "react";
 export default function Page({
   params,
 }: {
-  params: { productId: string };
+  params: Promise<{ productId: string }>;
 }) {
-  const { productId } = params;
+  const { productId } = React.use(params);
   const [product, setProduct] = React.useState<Awaited<ReturnType<typeof fetchProductById>>>(null);
 
   React.useEffect(() => {
