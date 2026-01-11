@@ -14,8 +14,10 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { cn } from "@/lib/utils";
 import { allCategories, Category } from "@/lib/constants";
-import { redirect } from "next/navigation";
+import { redirect, useRouter } from "next/navigation";
 import { Badge } from "@/components/ui/badge";
+import { fetchProducts } from "@/lib/catalog";
+import { Product } from "@/lib/data";
 import { useCartStore } from "@/store/store";
 import Image from "next/image";
 import Logo from "@/assets/images/logo.png";
@@ -274,6 +276,51 @@ function MobileCategory() {
 export function Header() {
   const { cart } = useCartStore();
   const { user, logout } = useAuthStore();
+  const router = useRouter(); 
+  const [searchQuery, setSearchQuery] = React.useState("");
+  const [suggestions, setSuggestions] = React.useState<{ name: string; id: string; slug: string }[]>([]);
+  const [allSearchData, setAllSearchData] = React.useState<{ name: string; id: string; slug: string }[]>([]);
+  const [showSuggestions, setShowSuggestions] = React.useState(false);
+
+  React.useEffect(() => {
+    fetchProducts().then((products) => {
+      const formatted = products.map((p) => ({
+        name: p.details.name,
+        id: p.id,
+        slug: p.details.productCode || p.id, 
+      }));
+      setAllSearchData(formatted);
+    });
+  }, []);
+
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const query = e.target.value;
+    setSearchQuery(query);
+
+    if (query.length >= 2) {
+      const matches = allSearchData
+        .filter((item) => item.name.toLowerCase().includes(query.toLowerCase()))
+        .slice(0, 5);
+      setSuggestions(matches);
+      setShowSuggestions(true);
+    } else {
+      setSuggestions([]);
+      setShowSuggestions(false);
+    }
+  };
+
+  const handleSelectSuggestion = (id: string) => {
+    router.push(`/products/${id}`);
+    setShowSuggestions(false);
+    setSearchQuery("");
+  }
+
+  const handleSearch = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter" && searchQuery.trim()) {
+      router.push(`/products?search=${encodeURIComponent(searchQuery)}`);
+      setShowSuggestions(false);
+    }
+  };
 
   const [sidebarOpen, setSidebarOpen] = React.useState(false);
   const [profile, setProfile] = React.useState(false);
@@ -342,9 +389,32 @@ export function Header() {
 
               <input
                 type="text"
-                placeholder="Search"
+                placeholder="Search products..."
+                value={searchQuery}
+                onChange={handleSearchChange}
+                onKeyDown={handleSearch}
+                onBlur={() => setTimeout(() => setShowSuggestions(false), 200)}
+                onFocus={() => {
+                   if(searchQuery.length >= 2) setShowSuggestions(true);
+                }}
                 className="w-full text-black py-3 pl-10 pr-4 rounded-lg bg-gray-100 focus:outline-none focus:ring-1 focus:ring-red-500"
               />
+              {showSuggestions && suggestions.length > 0 && (
+                <div className="absolute top-full left-0 right-0 bg-white shadow-lg rounded-b-lg border border-gray-200 mt-1 z-50 overflow-hidden">
+                  {suggestions.map((item) => (
+                    <div
+                      key={item.id}
+                      onMouseDown={(e) => {
+                        e.preventDefault(); // Prevent blur event before click
+                        handleSelectSuggestion(item.id);
+                      }}
+                      className="px-4 py-2 hover:bg-gray-100 cursor-pointer text-black text-sm"
+                    >
+                      {item.name}
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
           </div>
 
