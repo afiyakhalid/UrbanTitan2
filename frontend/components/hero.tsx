@@ -37,7 +37,7 @@ export function Hero() {
       <div className="mx-auto w-full max-w-3xl">
         <div className="bg-gradient-to-r mt-3 from-gray-100 via-gray-50 to-gray-100 text-gray-800 py-3 rounded-b-sm shadow-xs border border-gray-200 flex items-center justify-center text-center">
           <p className="text-sm md:text-[1rem] font-semibold tracking-wide">
-            🚚 We deliver exclusively across Bangalore — Fast, Reliable & Safe
+            🚚 We deliver exclusively across Kalaburgi — Fast, Reliable & Safe
             Delivery!
           </p>
         </div>
