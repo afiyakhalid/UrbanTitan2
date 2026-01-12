@@ -1,4 +1,4 @@
-import { Product as ProductType } from "@/lib/data";
+import { Product as ProductType } from "@/lib/types";
 import { devtools, persist, createJSONStorage } from "zustand/middleware";
 import { create } from "zustand";
 

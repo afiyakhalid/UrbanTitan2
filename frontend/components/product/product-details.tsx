@@ -1,6 +1,6 @@
 "use client";
 
-import { type Product as ProductType } from "@/lib/data";
+import { type Product as ProductType } from "@/lib/types";
 import { ChevronRight, Minus, Plus, Scale, Star } from "lucide-react";
 import React from "react";
 import {

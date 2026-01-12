@@ -1,4 +1,4 @@
-import { type RatingBreakdownItem } from "@/lib/data";
+import { type RatingBreakdownItem } from "@/lib/types";
 import { Star } from "lucide-react";
 
 export function ProductRatings({

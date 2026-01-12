@@ -1,13 +1,10 @@
 "use client";
 
-import { productData, type Product as ProductType } from "@/lib/data";
+import { type Product as ProductType } from "@/lib/types";
 import { fetchProducts } from "@/lib/catalog";
 import { ChevronLeft, ChevronRight, Star } from "lucide-react";
 import React from "react";
 import Image from "next/image";
-
-// --- Initial sample data (will be replaced by API fetch) ---
-const initialTopShelfs: ProductType[] = productData.slice(6, 10);
 
 function TopShelfCard({ product }: { product: ProductType }) {
   return (
@@ -63,7 +60,7 @@ function TopShelfCard({ product }: { product: ProductType }) {
 }
 
 export function TopShelf() {
-  const [topShelfs, setTopShelfs] = React.useState<ProductType[]>(initialTopShelfs);
+  const [topShelfs, setTopShelfs] = React.useState<ProductType[]>([]);
   const scrollRef = React.useRef<HTMLDivElement | null>(null);
 
   React.useEffect(() => {
