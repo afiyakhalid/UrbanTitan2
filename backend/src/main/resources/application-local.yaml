@@ -13,6 +13,22 @@ spring:
     properties:
       hibernate:
         format_sql: true
+  mail:
+    host: ${MAIL_SMTP_HOST}
+    port: ${MAIL_SMTP_PORT}
+    username: ${MAIL_SMTP_USERNAME}
+    password: ${MAIL_SMTP_PASSWORD}
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+            required: true
+          ssl:
+            enable: false
+          socketFactory:
+            fallback: true
 
 management:
   endpoints:
@@ -33,6 +49,7 @@ security:
     secret: ${JWT_SECRET}
     issuer: urbantitan
     expiry-seconds: 604800
+  mail:
+    from-address: ${MAIL_FROM_ADDRESS}
   otp:
     expiry-seconds: 300
-    debug-return: true
