@@ -10,7 +10,7 @@ spring:
       connection-timeout: 20000
   jpa:
     hibernate:
-      ddl-auto: validate
+      ddl-auto: update
     show-sql: false
     properties:
       hibernate:
@@ -72,3 +72,7 @@ security:
     from-address: ${MAIL_FROM_ADDRESS}
   otp:
     expiry-seconds: 300
+
+app:
+  notification:
+    fallback-email: ${NOTIFICATION_FALLBACK_EMAIL}

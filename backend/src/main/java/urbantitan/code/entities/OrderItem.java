@@ -17,10 +17,10 @@ import java.util.UUID;
     name = "order_items",
     indexes = {
         @Index(name = "orderItemsOrderIdx", columnList = "order_id"),
-        @Index(name = "orderItemsVariantIdx", columnList = "product_variant_id")
+        @Index(name = "orderItemsProductIdx", columnList = "product_id"),
+        @Index(name = "orderItemsQuotationIdx", columnList = "quotation_id")
     }
 )
-
 public class OrderItem {
 
     @Id
@@ -34,17 +34,42 @@ public class OrderItem {
     private Order order;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "product_variant_id", nullable = false,
-        foreignKey = @ForeignKey(name = "fk_orderitem_product_variant"))
-    private ProductVariant productVariant;
+    @JoinColumn(name = "product_id", nullable = false,
+        foreignKey = @ForeignKey(name = "fk_orderitem_product"))
+    private Product product;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "quotation_id",
+        foreignKey = @ForeignKey(name = "fk_orderitem_quotation"))
+    private DealerQuotation quotation;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "dealer_user_id",
+        foreignKey = @ForeignKey(name = "fk_orderitem_dealer"))
+    private User dealer;
+
+    @Column(name = "product_name", length = 255, nullable = false)
+    private String productName;
+
+    @Column(name = "dealer_name", length = 255)
+    private String dealerName;
+
+    @Column(name = "dealer_email", length = 255)
+    private String dealerEmail;
 
     @Column(name = "quantity", nullable = false)
     private Integer quantity;
 
-    @Column(name = "price", precision = 10, scale = 2, nullable = false)
-    private BigDecimal price;
+    @Column(name = "unit_price", precision = 12, scale = 2, nullable = false)
+    private BigDecimal unitPrice;
 
-    @Column(name = "total_price", precision = 10, scale = 2, nullable = false)
+    @Column(name = "mrp", precision = 12, scale = 2)
+    private BigDecimal mrp;
+
+    @Column(name = "discount_amount", precision = 12, scale = 2)
+    private BigDecimal discountAmount;
+
+    @Column(name = "total_price", precision = 12, scale = 2, nullable = false)
     private BigDecimal totalPrice;
 
     @CreationTimestamp

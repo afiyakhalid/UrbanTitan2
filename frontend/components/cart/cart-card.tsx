@@ -1,21 +1,41 @@
 "use client";
 
-import { allBrands } from "@/lib/constants";
 import { useCartStore, type CartItemType } from "@/store/store";
-import { Minus, Plus, Scale } from "lucide-react";
+import { useCompareStore, type CompareItem } from "@/store/compare";
+import { Minus, Plus, Scale, Check } from "lucide-react";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 
 export function CartItemCard({ item }: { item: CartItemType }) {
+  const router = useRouter();
   const { updateQuantity } = useCartStore();
+  const { addToCompare, removeFromCompare, isInCompare, compareItems } = useCompareStore();
 
-  const handleCompare = (cat: string) => {
-    const allBrandSlugs = allBrands.map((b) => b.slug);
+  const inCompare = isInCompare(item.id);
 
-    const params = new URLSearchParams();
-    params.set("categories", cat);
-    params.set("brands", allBrandSlugs.join(","));
+  const handleCompare = () => {
+    if (inCompare) {
+      removeFromCompare(item.id);
+    } else {
+      if (compareItems.length >= 4) {
+        alert("You can compare up to 4 products at a time");
+        return;
+      }
+      const compareItem: CompareItem = {
+        productId: item.id,
+        productName: item.details.name,
+        brandName: item.details.brand.name,
+        categorySlug: item.details.category.slug,
+        productImage: item.images[0],
+        price: item.details.price,
+        mrp: item.details.mrp,
+      };
+      addToCompare(compareItem);
+    }
+  };
 
-    window.location.href = `/products?${params.toString()}`;
+  const goToCompare = () => {
+    router.push("/products/compare");
   };
 
   return (
@@ -38,9 +58,6 @@ export function CartItemCard({ item }: { item: CartItemType }) {
           <p className="text-md text-gray-500">
             {/* Size: <span className="font-medium">{selectedSize}</span> */}
           </p>
-          {/* <p className="text-md text-gray-500">
-            Color: <span className="font-medium">{item.color}</span>
-          </p> */}
 
           <div className="mt-auto text-xl lg:text-2xl font-semibold text-gray-900">
             ₹{(item.quantity * item.details.price).toLocaleString()}
@@ -62,14 +79,28 @@ export function CartItemCard({ item }: { item: CartItemType }) {
 
         {/* Controls */}
         <div className="flex flex-col items-end justify-between self-stretch">
-          {/* Compare  */}
-          <button
-            onClick={() => handleCompare(item.details.category.slug)}
-            className="cursor-pointer py-1 px-3 flex items-center gap-2 border border-gray-400 text-md text-gray-800 rounded-md font-semibold hover:bg-gray-50 transition"
-          >
-            <Scale className="w-5 h-5" />
-            Compare
-          </button>
+          {/* Compare Buttons */}
+          <div className="flex items-center gap-2">
+            <button
+              onClick={handleCompare}
+              className={`cursor-pointer py-1 px-3 flex items-center gap-2 border text-md rounded-md font-semibold transition
+                ${inCompare 
+                  ? "border-green-600 text-green-600 bg-green-50 hover:bg-green-100" 
+                  : "border-gray-400 text-gray-800 hover:bg-gray-50"
+                }`}
+            >
+              {inCompare ? <Check className="w-5 h-5" /> : <Scale className="w-5 h-5" />}
+              {inCompare ? "Added" : "Compare"}
+            </button>
+            {compareItems.length > 0 && (
+              <button
+                onClick={goToCompare}
+                className="cursor-pointer py-1 px-3 flex items-center gap-1 bg-black text-white text-sm rounded-md font-medium hover:bg-gray-800 transition"
+              >
+                View ({compareItems.length})
+              </button>
+            )}
+          </div>
 
           {/* Quantity Controls */}
           <div className="flex items-center border border-gray-300 rounded-md">

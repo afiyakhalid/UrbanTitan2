@@ -35,6 +35,7 @@ tasks.register('localRun') {
     doFirst{
         tasks.withType(Test).configureEach { enabled = false }
     }
+    dependsOn 'bootRun'
 }
 
 
