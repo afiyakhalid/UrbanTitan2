@@ -15,6 +15,10 @@ import {
 } from "nuqs";
 import { CategoryDropdown } from "@/components/filter/category-dropdown";
 
+import { useSearchParams } from "next/navigation";
+
+import Link from "next/link";
+
 export function PageComponent() {
   const [open, setOpen] = React.useState<boolean>(false);
 

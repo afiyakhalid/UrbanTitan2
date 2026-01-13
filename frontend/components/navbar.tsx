@@ -17,7 +17,6 @@ import { allCategories, Category } from "@/lib/constants";
 import { redirect, useRouter } from "next/navigation";
 import { Badge } from "@/components/ui/badge";
 import { fetchProducts } from "@/lib/catalog";
-import { Product } from "@/lib/data";
 import { useCartStore } from "@/store/store";
 import Image from "next/image";
 import Logo from "@/assets/images/logo.png";
@@ -279,7 +278,9 @@ export function Header() {
   const { user, logout } = useAuthStore();
   const router = useRouter(); 
   const [searchQuery, setSearchQuery] = React.useState("");
-  const [suggestions, setSuggestions] = React.useState<{ name: string; id: string; slug: string }[]>([]);
+  const [suggestions, setSuggestions] = React.useState<
+    { type: string; label: string; slug: string; score?: number }[]
+  >([]);
   // REMOVED: allSearchData state is no longer needed
   const [showSuggestions, setShowSuggestions] = React.useState(false);
 
@@ -291,17 +292,27 @@ export function Header() {
           const res = await fetch(
             `${getApiBaseUrl()}/api/v1/search/suggest?q=${encodeURIComponent(
               searchQuery
-            )}&limit=5&types=product`
+            )}&limit=5&types=product,category`
           );
+
+          console.log("[Navbar] Fetching suggestions for:", searchQuery); 
 
           if (res.ok) {
             const data = await res.json();
-            // Map backend DTO to frontend format
-            const formatted = data.map((item: any) => ({
-              name: item.text || item.title || item.name, 
-              id: item.id,
-              slug: item.slug || String(item.id),
-            }));
+            console.log("[Navbar] Raw backend response:", data); 
+
+            const formatted = (Array.isArray(data) ? data : [])
+              .map((item: any) => ({
+                type: String(item.type ?? ""),
+                label: String(item.label ?? item.text ?? item.name ?? item.title ?? ""),
+                slug: String(item.slug ?? ""),
+                score:
+                  item.score === null || item.score === undefined
+                    ? undefined
+                    : Number(item.score),
+              }))
+              .filter((item: any) => item.label.trim() && item.type.trim());
+
             setSuggestions(formatted);
             setShowSuggestions(true);
           }
@@ -330,10 +341,110 @@ export function Header() {
   }
 // ...existing code...
 
+  const handleSelectSearchSuggestion = async (item: {
+    type: string;
+    label: string;
+    slug: string;
+  }) => {
+    setShowSuggestions(false);
+    setSearchQuery("");
+
+    if (item.type === "category" && item.slug) {
+      router.push(`/products?categories=${encodeURIComponent(item.slug)}`);
+      return;
+    }
+
+    // If backend only gives slug for products, try to resolve to an ID so we can go to /products/[productId]
+    if (item.type === "product" && item.slug) {
+      try {
+        const res = await fetch(`${getApiBaseUrl()}/api/v1/products/`);
+        if (res.ok) {
+          const products = (await res.json()) as Array<{
+            id: string;
+            slug?: string;
+            productCode?: string | null;
+          }>;
+
+          const hit = products.find(
+            (p) =>
+              String(p.slug ?? "").toLowerCase() === item.slug.toLowerCase() ||
+              String(p.productCode ?? "").toLowerCase() === item.slug.toLowerCase()
+          );
+
+          if (hit?.id) {
+            router.push(`/products/${hit.id}`);
+            return;
+          }
+        }
+      } catch {
+        // ignore and fall back
+      }
+    }
+
+    // Fallback: use the search results page
+    router.push(`/products?search=${encodeURIComponent(item.label || item.slug)}`);
+  };
+
+  const resolveAndNavigateSearch = async (q: string) => {
+    const trimmed = q.trim();
+    if (!trimmed) return;
+
+    setShowSuggestions(false);
+
+    try {
+      // Always ask backend on Enter (don’t rely on debounced state)
+      const res = await fetch(
+        `${getApiBaseUrl()}/api/v1/search/suggest?q=${encodeURIComponent(
+          trimmed
+        )}&limit=10&buffer=2&types=product,category`
+      );
+
+      if (!res.ok) {
+        router.push(`/products?search=${encodeURIComponent(trimmed)}`);
+        return;
+      }
+
+      const data = await res.json();
+      const formatted = (Array.isArray(data) ? data : [])
+        .map((item: any) => ({
+          type: String(item.type ?? ""),
+          label: String(item.label ?? item.text ?? item.name ?? item.title ?? ""),
+          slug: String(item.slug ?? ""),
+          score:
+            item.score === null || item.score === undefined
+              ? undefined
+              : Number(item.score),
+        }))
+        .filter((item: any) => item.label.trim() && item.type.trim());
+
+      // Prefer category on Enter if backend suggests one.
+      const bestCategory = formatted
+        .filter((s: any) => s.type === "category" && s.slug)
+        .sort((a: any, b: any) => (b.score ?? 0) - (a.score ?? 0))[0];
+
+      if (bestCategory?.slug) {
+        // Replace (not push) so Enter doesn't feel like it "waited".
+        router.replace(
+          `/products?categories=${encodeURIComponent(bestCategory.slug)}`
+        );
+        return;
+      }
+      // If no category match, keep the search results page.
+    } catch {
+      // If backend suggest fails, keep the search results page.
+    }
+  };
+
   const handleSearch = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Enter" && searchQuery.trim()) {
-      router.push(`/products?search=${encodeURIComponent(searchQuery)}`);
+      e.preventDefault();
+      // Fast path: navigate immediately so UI updates right away.
+      const q = searchQuery.trim();
       setShowSuggestions(false);
+      router.push(`/products?search=${encodeURIComponent(q)}`);
+
+      // Background: if backend suggests a category (e.g. Cement), replace URL to category listing.
+      void resolveAndNavigateSearch(q);
     }
   };
 
@@ -416,16 +527,21 @@ export function Header() {
               />
               {showSuggestions && suggestions.length > 0 && (
                 <div className="absolute top-full left-0 right-0 bg-white shadow-lg rounded-b-lg border border-gray-200 mt-1 z-50 overflow-hidden">
-                  {suggestions.map((item) => (
+                  {suggestions.map((item, idx) => (
                     <div
-                      key={item.id}
+                      key={`${item.type}:${item.slug || item.label}:${idx}`}
                       onMouseDown={(e) => {
                         e.preventDefault(); // Prevent blur event before click
-                        handleSelectSuggestion(item.id);
+                        handleSelectSearchSuggestion(item);
                       }}
                       className="px-4 py-2 hover:bg-gray-100 cursor-pointer text-black text-sm"
                     >
-                      {item.name}
+                      <div className="flex items-center justify-between gap-3">
+                        <span className="truncate">{item.label}</span>
+                        <span className="text-[11px] uppercase tracking-wide text-gray-500">
+                          {item.type}
+                        </span>
+                      </div>
                     </div>
                   ))}
                 </div>

@@ -168,10 +168,57 @@ export async function fetchProductById(id: string): Promise<UiProduct | null> {
 
 export async function searchProducts(query: string): Promise<UiProduct[]> {
   try {
-    const res = await apiFetch(`/api/v1/search?query=${encodeURIComponent(query)}`);
-    const data = (await res.json()) as BackendProduct[];
-    return data.map(mapBackendProductToUi);
-  } catch {
+    // Uses existing backend suggest endpoint only (no backend changes).
+    // Backend returns: [{ type: 'product'|'category', label, slug, score }]
+    // Run network requests in parallel for faster perceived results.
+    const [suggestions, allProducts] = await Promise.all([
+      (async () => {
+        const suggestRes = await apiFetch(
+          `/api/v1/search/suggest?q=${encodeURIComponent(query)}&limit=50&types=product,category`
+        );
+        return (await suggestRes.json()) as Array<{
+          type: string;
+          label: string;
+          slug: string;
+          score?: number;
+        }>;
+      })(),
+      fetchProducts(),
+    ]);
+
+    if (!suggestions || suggestions.length === 0) return [];
+
+    // If best suggestion is a category, show everything in that category.
+    const best = suggestions[0];
+    if (best?.type === "category" && best.slug) {
+      return allProducts.filter((p) => p.details.category.slug === best.slug);
+    }
+
+    // Otherwise use product slugs.
+    const productSlugsInOrder = suggestions
+      .filter((s) => s.type === "product" && s.slug)
+      .map((s) => s.slug);
+
+    const productSlugRank = new Map<string, number>();
+    productSlugsInOrder.forEach((slug, idx) => {
+      if (!productSlugRank.has(slug)) productSlugRank.set(slug, idx);
+    });
+
+    const matched = allProducts.filter((p) => {
+      const code = p.details.productCode;
+      return code ? productSlugRank.has(code) : false;
+    });
+
+    // Preserve backend ordering.
+    matched.sort((a, b) => {
+      const ra = productSlugRank.get(a.details.productCode ?? "") ?? 1e9;
+      const rb = productSlugRank.get(b.details.productCode ?? "") ?? 1e9;
+      return ra - rb;
+    });
+
+    return matched;
+  } catch (error) {
+    console.error("Search failed", error);
     return [];
   }
 }
