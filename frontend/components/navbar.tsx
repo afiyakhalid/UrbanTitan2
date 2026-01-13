@@ -16,7 +16,6 @@ import { cn } from "@/lib/utils";
 import { allCategories, Category } from "@/lib/constants";
 import { redirect, useRouter } from "next/navigation";
 import { Badge } from "@/components/ui/badge";
-import { fetchProducts } from "@/lib/catalog";
 import { useCartStore } from "@/store/store";
 import Image from "next/image";
 import Logo from "@/assets/images/logo.png";
@@ -284,7 +283,7 @@ export function Header() {
   // REMOVED: allSearchData state is no longer needed
   const [showSuggestions, setShowSuggestions] = React.useState(false);
 
-  // CHANGED: Use effect handles debounced API call instead of fetching all products
+  // Typeahead suggestions (dropdown only)
   React.useEffect(() => {
     const delayDebounceFn = setTimeout(async () => {
       if (searchQuery.trim().length >= 2) {
@@ -292,15 +291,11 @@ export function Header() {
           const res = await fetch(
             `${getApiBaseUrl()}/api/v1/search/suggest?q=${encodeURIComponent(
               searchQuery
-            )}&limit=5&types=product,category`
+            )}&limit=5&types=product,category,brand`
           );
-
-          console.log("[Navbar] Fetching suggestions for:", searchQuery); 
 
           if (res.ok) {
             const data = await res.json();
-            console.log("[Navbar] Raw backend response:", data); 
-
             const formatted = (Array.isArray(data) ? data : [])
               .map((item: any) => ({
                 type: String(item.type ?? ""),
@@ -324,7 +319,7 @@ export function Header() {
         setSuggestions([]);
         setShowSuggestions(false);
       }
-    }, 300); // Wait 300ms after typing stops
+    }, 250); // Debounce 250ms
 
     return () => clearTimeout(delayDebounceFn);
   }, [searchQuery]);
@@ -333,13 +328,6 @@ export function Header() {
     // Just update the query, let useEffect handle the fetching
     setSearchQuery(e.target.value);
   };
-
-  const handleSelectSuggestion = (id: string) => {
-    router.push(`/products/${id}`);
-    setShowSuggestions(false);
-    setSearchQuery("");
-  }
-// ...existing code...
 
   const handleSelectSearchSuggestion = async (item: {
     type: string;
@@ -350,35 +338,20 @@ export function Header() {
     setSearchQuery("");
 
     if (item.type === "category" && item.slug) {
-      router.push(`/products?categories=${encodeURIComponent(item.slug)}`);
+      router.push(`/category/${encodeURIComponent(item.slug)}`);
       return;
     }
 
-    // If backend only gives slug for products, try to resolve to an ID so we can go to /products/[productId]
+    if (item.type === "brand" && item.slug) {
+      router.push(`/brand/${encodeURIComponent(item.slug)}`);
+      return;
+    }
+
     if (item.type === "product" && item.slug) {
-      try {
-        const res = await fetch(`${getApiBaseUrl()}/api/v1/products/`);
-        if (res.ok) {
-          const products = (await res.json()) as Array<{
-            id: string;
-            slug?: string;
-            productCode?: string | null;
-          }>;
-
-          const hit = products.find(
-            (p) =>
-              String(p.slug ?? "").toLowerCase() === item.slug.toLowerCase() ||
-              String(p.productCode ?? "").toLowerCase() === item.slug.toLowerCase()
-          );
-
-          if (hit?.id) {
-            router.push(`/products/${hit.id}`);
-            return;
-          }
-        }
-      } catch {
-        // ignore and fall back
-      }
+      // Product page route expects /products/[productId] but we pass slug.
+      // fetchProductById is updated to handle slug fallback.
+      router.push(`/products/${encodeURIComponent(item.slug)}`);
+      return;
     }
 
     // Fallback: use the search results page
@@ -392,20 +365,26 @@ export function Header() {
     setShowSuggestions(false);
 
     try {
-      // Always ask backend on Enter (don’t rely on debounced state)
       const res = await fetch(
-        `${getApiBaseUrl()}/api/v1/search/suggest?q=${encodeURIComponent(
-          trimmed
-        )}&limit=10&buffer=2&types=product,category`
+        `${getApiBaseUrl()}/api/v1/search?q=${encodeURIComponent(trimmed)}&limit=50`
       );
-
       if (!res.ok) {
         router.push(`/products?search=${encodeURIComponent(trimmed)}`);
         return;
       }
 
       const data = await res.json();
-      const formatted = (Array.isArray(data) ? data : [])
+      const list = Array.isArray(data)
+        ? data
+        : Array.isArray((data as any)?.matches)
+          ? (data as any).matches
+          : Array.isArray((data as any)?.results)
+            ? (data as any).results
+            : Array.isArray((data as any)?.items)
+              ? (data as any).items
+              : [];
+
+      const formatted = (Array.isArray(list) ? list : [])
         .map((item: any) => ({
           type: String(item.type ?? ""),
           label: String(item.label ?? item.text ?? item.name ?? item.title ?? ""),
@@ -417,34 +396,22 @@ export function Header() {
         }))
         .filter((item: any) => item.label.trim() && item.type.trim());
 
-      // Prefer category on Enter if backend suggests one.
-      const bestCategory = formatted
-        .filter((s: any) => s.type === "category" && s.slug)
-        .sort((a: any, b: any) => (b.score ?? 0) - (a.score ?? 0))[0];
-
-      if (bestCategory?.slug) {
-        // Replace (not push) so Enter doesn't feel like it "waited".
-        router.replace(
-          `/products?categories=${encodeURIComponent(bestCategory.slug)}`
-        );
+      const best = formatted[0];
+      if (best) {
+        await handleSelectSearchSuggestion(best);
         return;
       }
-      // If no category match, keep the search results page.
+
+      router.push(`/products?search=${encodeURIComponent(trimmed)}`);
     } catch {
-      // If backend suggest fails, keep the search results page.
+      router.push(`/products?search=${encodeURIComponent(trimmed)}`);
     }
   };
 
   const handleSearch = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Enter" && searchQuery.trim()) {
       e.preventDefault();
-      // Fast path: navigate immediately so UI updates right away.
-      const q = searchQuery.trim();
-      setShowSuggestions(false);
-      router.push(`/products?search=${encodeURIComponent(q)}`);
-
-      // Background: if backend suggests a category (e.g. Cement), replace URL to category listing.
-      void resolveAndNavigateSearch(q);
+      void resolveAndNavigateSearch(searchQuery);
     }
   };
 

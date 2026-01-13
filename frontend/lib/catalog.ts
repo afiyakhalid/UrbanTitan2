@@ -8,6 +8,18 @@ import {
   type CategoryLink as UiCategoryLink,
 } from "@/lib/constants";
 
+type CacheEntry<T> = { value: T; expiresAt: number };
+
+const CACHE_TTL_MS = 60_000; // 60s, keeps UI snappy without going stale for long
+
+let brandsCache: CacheEntry<UiBrand[]> | null = null;
+let categoriesCache: CacheEntry<UiCategoryLink[]> | null = null;
+let productsCache: CacheEntry<UiProduct[]> | null = null;
+
+function isFresh<T>(entry: CacheEntry<T> | null): entry is CacheEntry<T> {
+  return !!entry && Date.now() < entry.expiresAt;
+}
+
 export type BackendBrand = {
   id: string;
   name: string;
@@ -127,30 +139,39 @@ export function mapBackendProductToUi(product: BackendProduct): UiProduct {
 }
 
 export async function fetchBrands(): Promise<UiBrand[]> {
+  if (isFresh(brandsCache)) return brandsCache.value;
   try {
     const res = await apiFetch("/api/v1/brands/");
     const data = (await res.json()) as BackendBrand[];
-    return data.map(mapBackendBrandToUi);
+    const mapped = data.map(mapBackendBrandToUi);
+    brandsCache = { value: mapped, expiresAt: Date.now() + CACHE_TTL_MS };
+    return mapped;
   } catch {
     return allBrands;
   }
 }
 
 export async function fetchCategories(): Promise<UiCategoryLink[]> {
+  if (isFresh(categoriesCache)) return categoriesCache.value;
   try {
     const res = await apiFetch("/api/v1/categories/");
     const data = (await res.json()) as BackendCategory[];
-    return data.map(mapBackendCategoryToUi);
+    const mapped = data.map(mapBackendCategoryToUi);
+    categoriesCache = { value: mapped, expiresAt: Date.now() + CACHE_TTL_MS };
+    return mapped;
   } catch {
     return allCategories;
   }
 }
 
 export async function fetchProducts(): Promise<UiProduct[]> {
+  if (isFresh(productsCache)) return productsCache.value;
   try {
     const res = await apiFetch("/api/v1/products/");
     const data = (await res.json()) as BackendProduct[];
-    return data.map(mapBackendProductToUi);
+    const mapped = data.map(mapBackendProductToUi);
+    productsCache = { value: mapped, expiresAt: Date.now() + CACHE_TTL_MS };
+    return mapped;
   } catch {
     return [];
   }
@@ -162,21 +183,35 @@ export async function fetchProductById(id: string): Promise<UiProduct | null> {
     const data = (await res.json()) as BackendProduct;
     return mapBackendProductToUi(data);
   } catch {
-    return null;
+    try {
+      const res = await apiFetch(`/api/v1/products/slug/${encodeURIComponent(id)}`);
+      const data = (await res.json()) as BackendProduct;
+      return mapBackendProductToUi(data);
+    } catch {
+      return null;
+    }
   }
 }
 
 export async function searchProducts(query: string): Promise<UiProduct[]> {
   try {
-    // Uses existing backend suggest endpoint only (no backend changes).
-    // Backend returns: [{ type: 'product'|'category', label, slug, score }]
-    // Run network requests in parallel for faster perceived results.
-    const [suggestions, allProducts] = await Promise.all([
+    // Backend returns mixed types; for the products page we only want product matches.
+    const [matches, allProducts] = await Promise.all([
       (async () => {
-        const suggestRes = await apiFetch(
-          `/api/v1/search/suggest?q=${encodeURIComponent(query)}&limit=50&types=product,category`
+        const res = await apiFetch(
+          `/api/v1/search?q=${encodeURIComponent(query)}&limit=50`
         );
-        return (await suggestRes.json()) as Array<{
+        const raw = (await res.json()) as unknown;
+        const list = Array.isArray(raw)
+          ? raw
+          : Array.isArray((raw as any)?.matches)
+            ? (raw as any).matches
+            : Array.isArray((raw as any)?.results)
+              ? (raw as any).results
+              : Array.isArray((raw as any)?.items)
+                ? (raw as any).items
+                : [];
+        return list as Array<{
           type: string;
           label: string;
           slug: string;
@@ -186,18 +221,11 @@ export async function searchProducts(query: string): Promise<UiProduct[]> {
       fetchProducts(),
     ]);
 
-    if (!suggestions || suggestions.length === 0) return [];
+    if (!Array.isArray(matches) || matches.length === 0) return [];
 
-    // If best suggestion is a category, show everything in that category.
-    const best = suggestions[0];
-    if (best?.type === "category" && best.slug) {
-      return allProducts.filter((p) => p.details.category.slug === best.slug);
-    }
-
-    // Otherwise use product slugs.
-    const productSlugsInOrder = suggestions
-      .filter((s) => s.type === "product" && s.slug)
-      .map((s) => s.slug);
+    const productSlugsInOrder = matches
+      .filter((m) => String(m.type).toLowerCase() === "product" && m.slug)
+      .map((m) => m.slug);
 
     const productSlugRank = new Map<string, number>();
     productSlugsInOrder.forEach((slug, idx) => {

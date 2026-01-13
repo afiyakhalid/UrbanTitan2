@@ -15,20 +15,17 @@ import {
 } from "nuqs";
 import { CategoryDropdown } from "@/components/filter/category-dropdown";
 
-import { useSearchParams } from "next/navigation";
-
-import Link from "next/link";
-
 export function PageComponent() {
   const [open, setOpen] = React.useState<boolean>(false);
+  const [loadingProducts, setLoadingProducts] = React.useState<boolean>(true);
+  const [loadingFilters, setLoadingFilters] = React.useState<boolean>(true);
+
+  const PAGE_SIZE = 24;
+  const [visibleCount, setVisibleCount] = React.useState<number>(PAGE_SIZE);
 
   const [allProducts, setAllProducts] = React.useState<ProductType[]>([]);
   const [allCats, setAllCats] = React.useState<CategoryLink[]>([]);
   const [allBrandItems, setAllBrandItems] = React.useState<Brand[]>([]);
-
-  const [filteredProducts, setFilteredProducts] = React.useState<
-    ProductType[] | null
-  >(null);
 
   const [categories, setCategories] = useQueryState(
     "categories",
@@ -74,30 +71,44 @@ export function PageComponent() {
     setOpen(false);
   };
 
+  // Fetch filters once (categories + brands)
   React.useEffect(() => {
     let cancelled = false;
+    setLoadingFilters(true);
     (async () => {
-      const productReq = search ? searchProducts(search) : fetchProducts();
-
-      const [products, cats, brandsList] = await Promise.all([
-        productReq,
+      const [cats, brandsList] = await Promise.all([
         fetchCategories(),
         fetchBrands(),
       ]);
       if (cancelled) return;
-      setAllProducts(products);
       setAllCats(cats);
       setAllBrandItems(brandsList);
+      setLoadingFilters(false);
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  // Fetch products when search changes
+  React.useEffect(() => {
+    let cancelled = false;
+    setLoadingProducts(true);
+    (async () => {
+      const products = search ? await searchProducts(search) : await fetchProducts();
+      if (cancelled) return;
+      setAllProducts(products);
+      setLoadingProducts(false);
     })();
     return () => {
       cancelled = true;
     };
   }, [search]);
 
-  React.useEffect(() => {
+  const filteredProducts = React.useMemo(() => {
     const source = allProducts.length > 0 ? allProducts : [];
 
-    const newProducts = source.filter((p) => {
+    return source.filter((p) => {
       const inPriceRange =
         p.details.price >= priceRange[0] && p.details.price <= priceRange[1];
 
@@ -110,12 +121,24 @@ export function PageComponent() {
 
       const meetsBrand =
         brands.length > 0 ? brands.includes(p.details.brand.slug) : true;
-      
+
       return inPriceRange && meetsDiscount && meetsCategory && meetsBrand;
     });
-
-    setFilteredProducts(newProducts);
   }, [allProducts, priceRange, discount, brands, categories]);
+
+  const deferredFilteredProducts = React.useDeferredValue(filteredProducts);
+
+  // Reset pagination when filters/search change.
+  React.useEffect(() => {
+    setVisibleCount(PAGE_SIZE);
+  }, [search, categories, brands, priceRange, discount]);
+
+  const visibleProducts = React.useMemo(
+    () => deferredFilteredProducts.slice(0, visibleCount),
+    [deferredFilteredProducts, visibleCount]
+  );
+
+  const hasMore = visibleCount < deferredFilteredProducts.length;
 
   return (
     <div className="w-full flex flex-col md:flex-row md:gap-6 max-w-8xl mx-auto px-12 py-8">
@@ -158,7 +181,7 @@ export function PageComponent() {
           {/* Category Filter */}
           <FilterSection title="Category">
             <div className="space-y-2">
-              {allCats.map((cat: CategoryLink) => (
+              {loadingFilters ? null : allCats.map((cat: CategoryLink) => (
                 <CategoryDropdown
                   key={cat.slug}
                   category={cat}
@@ -172,7 +195,7 @@ export function PageComponent() {
           {/* Brand Filter */}
           <FilterSection title="Brand">
             <div className="space-y-2">
-              {allBrandItems.map((brand: Brand) => (
+              {loadingFilters ? null : allBrandItems.map((brand: Brand) => (
                 <label
                   key={brand.slug}
                   className="flex items-center gap-2 text-md"
@@ -231,19 +254,35 @@ export function PageComponent() {
       {/* RIGHT PRODUCT GRID */}
       <main className="flex-1">
         <h2 className="font-semibold text-xl mb-4">
-          Found ({filteredProducts && filteredProducts.length} items)
+          Found ({deferredFilteredProducts.length} items)
         </h2>
 
         <div className="grid gap-3 grid-cols-[repeat(auto-fit,minmax(300px,1fr))]">
-          {filteredProducts &&
-            filteredProducts.map((product) => (
-              <ProductCard
-                key={product.id}
-                item={product}
-                widthAutoTake={true}
-              />
-            ))}
+          {loadingProducts
+            ? null
+            : visibleProducts.map((product) => (
+                <ProductCard
+                  key={product.id}
+                  item={product}
+                  widthAutoTake={true}
+                />
+              ))}
         </div>
+
+        {!loadingProducts && hasMore && (
+          <div className="flex justify-center mt-6">
+            <button
+              className="border rounded-md px-4 py-2 shadow-xs bg-white"
+              onClick={() =>
+                setVisibleCount((prev) =>
+                  Math.min(prev + PAGE_SIZE, deferredFilteredProducts.length)
+                )
+              }
+            >
+              Load more
+            </button>
+          </div>
+        )}
       </main>
     </div>
   );
