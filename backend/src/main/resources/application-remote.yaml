@@ -16,6 +16,8 @@ spring:
       hibernate:
         jdbc:
           time_zone: UTC
+        generate_statistics: true
+
 
   mail:
     host: ${MAIL_SMTP_HOST}
@@ -55,6 +57,8 @@ logging:
     urbantitan.code: INFO
     org.springframework.web: INFO
     org.hibernate: WARN
+    org.hibernate.stat: DEBUG
+
   pattern:
     console: "%d{yyyy-MM-dd HH:mm:ss} - %msg%n"
 

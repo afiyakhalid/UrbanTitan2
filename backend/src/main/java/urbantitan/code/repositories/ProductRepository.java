@@ -8,6 +8,7 @@ import org.springframework.stereotype.Repository;
 import urbantitan.code.entities.Product;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+import urbantitan.code.repositories.search.TrigramSearchRow;
 
 @Repository
 public interface ProductRepository extends JpaRepository<Product, UUID> {
@@ -29,6 +30,22 @@ public interface ProductRepository extends JpaRepository<Product, UUID> {
             "WHERE (p.isActive = TRUE OR p.isActive IS NULL) " +
             "ORDER BY p.isActive DESC, p.createdAt DESC")
     List<Product> findFallbackCandidates(org.springframework.data.domain.Pageable pageable);
+
+    @Query(value = """
+            SELECT
+              p.name AS label,
+              p.slug AS slug,
+              GREATEST(similarity(lower(p.name), :q), similarity(lower(p.slug), :q)) AS score
+            FROM product p
+            WHERE GREATEST(similarity(lower(p.name), :q), similarity(lower(p.slug), :q)) >= :minScore
+            ORDER BY score DESC
+            LIMIT :limit
+            """, nativeQuery = true)
+    List<TrigramSearchRow> suggestByTrigram(
+            @Param("q") String q,
+            @Param("minScore") double minScore,
+            @Param("limit") int limit
+    );
 
     default List<Product> findSearchCandidates(String q, int limit) {
         return findSearchCandidates(q, org.springframework.data.domain.PageRequest.of(0, limit));

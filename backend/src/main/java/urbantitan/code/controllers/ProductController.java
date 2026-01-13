@@ -79,23 +79,63 @@ public class ProductController {
     ) {
         int safeLimit = Math.max(1, Math.min(limit, 200));
 
-        // 1) Try to resolve query -> category (this makes "cemt" return Cement category products)
+        String query = q == null ? "" : q.trim();
+        if (query.isEmpty()) {
+            return ResponseEntity.ok(List.of());
+        }
+
+        // 1) Try resolve query -> category (typo tolerant)
         List<SearchSuggestionDTO> catSuggestions = searchSuggestionService.suggest(
-                q,
+                query,
                 3,
                 2,
                 java.util.EnumSet.of(SearchSuggestionService.SuggestType.category)
         );
-        if (!catSuggestions.isEmpty() && catSuggestions.get(0).getScore() >= 0.55) {
+        if (!catSuggestions.isEmpty() && catSuggestions.get(0).getScore() >= 0.25) {
             String categorySlug = catSuggestions.get(0).getSlug();
             List<ProductResponseDTO> byCategorySlug = productService.getProductsByCategorySlug(categorySlug);
-            // If category match exists but has no products, we still fall back to text search below.
             if (!byCategorySlug.isEmpty()) {
                 return ResponseEntity.ok(byCategorySlug.stream().limit(safeLimit).toList());
             }
         }
 
-        // 2) Fallback: simple text search (name/slug LIKE)
-        return ResponseEntity.ok(productService.searchProducts(q, safeLimit));
+        // 2) Try resolve query -> brand (typo tolerant)
+        List<SearchSuggestionDTO> brandSuggestions = searchSuggestionService.suggest(
+                query,
+                3,
+                2,
+                java.util.EnumSet.of(SearchSuggestionService.SuggestType.brand)
+        );
+        if (!brandSuggestions.isEmpty() && brandSuggestions.get(0).getScore() >= 0.25) {
+            String brandSlug = brandSuggestions.get(0).getSlug();
+            List<ProductResponseDTO> byBrandSlug = productService.getProductsByBrandSlug(brandSlug);
+            if (!byBrandSlug.isEmpty()) {
+                return ResponseEntity.ok(byBrandSlug.stream().limit(safeLimit).toList());
+            }
+        }
+
+        // 3) Typo-tolerant product search: use product trigram suggestions -> fetch by slug.
+        List<SearchSuggestionDTO> productSuggestions = searchSuggestionService.suggest(
+                query,
+                safeLimit,
+                2,
+                java.util.EnumSet.of(SearchSuggestionService.SuggestType.product)
+        );
+        if (!productSuggestions.isEmpty()) {
+            List<ProductResponseDTO> products = new java.util.ArrayList<>();
+            for (SearchSuggestionDTO s : productSuggestions) {
+                try {
+                    products.add(productService.getProductBySlug(s.getSlug()));
+                } catch (Exception ignored) {
+                    // skip missing slugs
+                }
+            }
+            if (!products.isEmpty()) {
+                return ResponseEntity.ok(products.stream().limit(safeLimit).toList());
+            }
+        }
+
+        // 4) Final fallback: simple text search (name/slug LIKE). This won't catch typos.
+        return ResponseEntity.ok(productService.searchProducts(query, safeLimit));
     }
 }

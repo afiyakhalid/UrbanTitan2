@@ -11,6 +11,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import urbantitan.code.entities.Category;
+import urbantitan.code.repositories.search.TrigramSearchRow;
 
 @Repository
 public interface CategoryRepository extends JpaRepository<Category, UUID> {
@@ -33,6 +34,22 @@ public interface CategoryRepository extends JpaRepository<Category, UUID> {
 
     @Query("SELECT c FROM Category c")
     List<Category> findFallbackCandidates(Pageable pageable);
+
+    @Query(value = """
+            SELECT
+              c.name AS label,
+              c.slug AS slug,
+              GREATEST(similarity(lower(c.name), :q), similarity(lower(c.slug), :q)) AS score
+            FROM categories c
+            WHERE GREATEST(similarity(lower(c.name), :q), similarity(lower(c.slug), :q)) >= :minScore
+            ORDER BY score DESC
+            LIMIT :limit
+            """, nativeQuery = true)
+    List<TrigramSearchRow> suggestByTrigram(
+            @Param("q") String q,
+            @Param("minScore") double minScore,
+            @Param("limit") int limit
+    );
 
     default List<Category> findSearchCandidates(String q, int limit) {
         return findSearchCandidates(q, org.springframework.data.domain.PageRequest.of(0, limit));
