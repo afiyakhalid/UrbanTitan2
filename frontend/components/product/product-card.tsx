@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { type Product as ProductType } from "@/lib/data";
+import { type Product as ProductType } from "@/lib/types";
 import { Star } from "lucide-react";
 import { cn } from "@/lib/utils";
 import Image from "next/image";

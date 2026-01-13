@@ -1,5 +1,6 @@
 package urbantitan.code.services;
 
+import jakarta.mail.internet.MimeMessage;
 import java.security.SecureRandom;
 import java.time.OffsetDateTime;
 import java.util.Locale;
@@ -7,12 +8,15 @@ import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import urbantitan.code.entities.EmailOtpChallenge;
 import urbantitan.code.entities.User;
+import urbantitan.code.enums.ROLES;
 import urbantitan.code.repositories.EmailOtpChallengeRepository;
 import urbantitan.code.repositories.UserRepository;
 
@@ -27,6 +31,7 @@ public class EmailOtpService {
 
     private final EmailOtpChallengeRepository challengeRepository;
     private final UserRepository userRepository;
+    private final JavaMailSender mailSender;
 
     private final BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
     private final SecureRandom secureRandom = new SecureRandom();
@@ -36,6 +41,9 @@ public class EmailOtpService {
 
     @Value("${security.otp.debug-return:false}")
     private boolean debugReturnOtp;
+
+    @Value("${security.mail.from-address:no-reply@urbantitan.in}")
+    private String fromAddress;
 
     public record OtpRequestResult(boolean debugEnabled, String debugOtp) {
     }
@@ -52,11 +60,10 @@ public class EmailOtpService {
         challenge.setExpiresAt(OffsetDateTime.now().plusSeconds(Math.max(30, otpExpirySeconds)));
         challengeRepository.save(challenge);
 
-        // Production note: integrate real email delivery here.
-        // For now we log OTP (and optionally return it only when debug is enabled).
-        log.info("Email OTP requested for {}. OTP={} (debug only)", normalizedEmail, otp);
+        sendOtpEmail(normalizedEmail, otp);
 
-        return new OtpRequestResult(debugReturnOtp, debugReturnOtp ? otp : null);
+        log.info("Email OTP requested for {}", normalizedEmail);
+        return new OtpRequestResult(false, null);
     }
 
     @Transactional
@@ -89,6 +96,8 @@ public class EmailOtpService {
                     u.setEmail(normalizedEmail);
                     u.setName(fallbackNameFromEmail(normalizedEmail));
                     u.setEmailVerified(OffsetDateTime.now());
+                    // JWT generation requires a role; keep a safe default for OTP-created users.
+                    u.setRole(ROLES.USER);
                     return userRepository.save(u);
                 });
     }
@@ -117,5 +126,34 @@ public class EmailOtpService {
             return "User";
         }
         return localPart.substring(0, 1).toUpperCase(Locale.ROOT) + localPart.substring(1);
+    }
+
+    private void sendOtpEmail(String toEmail, String otp) {
+        String subject = "Your UrbanTitan verification code";
+        String textBody = "Your UrbanTitan OTP is: " + otp + "\n\n" +
+                "This code expires in " + Math.max(30, otpExpirySeconds) + " seconds.";
+
+        try {
+            MimeMessage message = mailSender.createMimeMessage();
+            MimeMessageHelper helper = new MimeMessageHelper(message, false, "UTF-8");
+            helper.setFrom(fromAddress);
+            helper.setTo(toEmail);
+            helper.setSubject(subject);
+            helper.setText(textBody, false);
+            mailSender.send(message);
+        } catch (Exception e) {
+            // Log enough to diagnose SMTP/TLS/auth issues without leaking secrets.
+            log.error(
+                    "Failed to send OTP email. from={}, to={}, host={}, port={}, cause={} : {}",
+                    fromAddress,
+                    toEmail,
+                    System.getProperty("mail.smtp.host"),
+                    System.getProperty("mail.smtp.port"),
+                    e.getClass().getName(),
+                    e.getMessage(),
+                    e
+            );
+            throw new IllegalStateException("Failed to send OTP email");
+        }
     }
 }

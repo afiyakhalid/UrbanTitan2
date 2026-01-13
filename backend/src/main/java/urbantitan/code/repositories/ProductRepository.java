@@ -16,6 +16,7 @@ public interface ProductRepository extends JpaRepository<Product, UUID> {
     boolean existsBySlug(String slug);
     List<Product> findByIsActive(Boolean isActive);
     List<Product> findByCategoryId(UUID categoryId);
+    List<Product> findByCategoryIdAndIsActiveTrue(UUID categoryId);
     List<Product> findByBrandId(UUID brandId);
 
     @Query("SELECT p FROM Product p " +

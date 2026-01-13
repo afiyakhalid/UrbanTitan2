@@ -4,7 +4,7 @@ import React from "react";
 import { SlidersHorizontal, X } from "lucide-react";
 import { FilterSection } from "@/components/filter/filter-section";
 import { Brand, type CategoryLink } from "@/lib/constants";
-import { type Product as ProductType } from "@/lib/data";
+import { type Product as ProductType } from "@/lib/types";
 import { fetchBrands, fetchCategories, fetchProducts } from "@/lib/catalog";
 import { ProductCard } from "@/components/product/product-card";
 import {

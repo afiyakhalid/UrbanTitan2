@@ -1,5 +1,5 @@
 import { apiFetch } from "@/lib/api";
-import { productData, type Product as UiProduct } from "@/lib/data";
+import { type Product as UiProduct } from "@/lib/types";
 import {
   allBrands,
   allCategories,
@@ -50,7 +50,6 @@ export type BackendProduct = {
 };
 
 const DEFAULT_PRODUCT_IMAGE =
-  productData[0]?.images?.[0] ??
   "https://cdn-media.buildersmart.in/media/catalog/product/cache/1/image/200x200/9df78eab33525d08d6e5fb8d27136e95/b/r/brick_image.png";
 
 function toNumber(v: unknown, fallback: number): number {
@@ -152,7 +151,7 @@ export async function fetchProducts(): Promise<UiProduct[]> {
     const data = (await res.json()) as BackendProduct[];
     return data.map(mapBackendProductToUi);
   } catch {
-    return productData;
+    return [];
   }
 }
 

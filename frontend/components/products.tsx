@@ -1,15 +1,13 @@
 "use client";
 
-import { productData, type Product as ProductType } from "@/lib/data";
+import { type Product as ProductType } from "@/lib/types";
 import { fetchProducts } from "@/lib/catalog";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { ProductCard } from "@/components/product/product-card";
 import React from "react";
 
 export function Products() {
-  const [items, setItems] = React.useState<ProductType[]>(
-    productData.slice(0, 6)
-  );
+  const [items, setItems] = React.useState<ProductType[]>([]);
   const scrollRef = React.useRef<HTMLDivElement | null>(null);
 
   React.useEffect(() => {
