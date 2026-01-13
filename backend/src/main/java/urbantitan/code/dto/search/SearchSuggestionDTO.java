@@ -22,3 +22,4 @@ public class SearchSuggestionDTO {
 
     private double score;
 }
+//this works
