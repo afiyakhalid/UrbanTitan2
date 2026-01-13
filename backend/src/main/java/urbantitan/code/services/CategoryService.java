@@ -7,6 +7,8 @@ import urbantitan.code.dto.category.CategoryRequestDTO;
 import urbantitan.code.dto.category.CategoryResponseDTO;
 import urbantitan.code.entities.Category;
 import urbantitan.code.repositories.CategoryRepository;
+import urbantitan.code.services.search.FuzzyScorer;
+
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -116,5 +118,30 @@ public class CategoryService {
 
     public boolean existsBySlug(String slug) {
         return categoryRepository.existsBySlug(slug);
+    }
+
+    public List<CategoryResponseDTO> searchCategories(String q, int limit) {
+        String query = q == null ? "" : q.trim();
+        if (query.isEmpty()) {
+            return List.of();
+        }
+        int safeLimit = Math.max(1, Math.min(limit, 50));
+
+        // Start with LIKE candidates; if too few (typos), fallback to a broader pool.
+        List<Category> candidates = categoryRepository.findSearchCandidates(query.toLowerCase(java.util.Locale.ROOT), Math.max(50, safeLimit * 20));
+        if (candidates.size() < Math.max(10, safeLimit * 3)) {
+            candidates = categoryRepository.findFallbackCandidates(Math.max(200, safeLimit * 40));
+        }
+
+        return candidates.stream()
+                .map(c -> new java.util.AbstractMap.SimpleEntry<>(c, Math.max(
+                        FuzzyScorer.score(query, c.getName()),
+                        FuzzyScorer.score(query, c.getSlug())
+                )))
+                .filter(e -> e.getValue() >= 0.20)
+                .sorted((a, b) -> Double.compare(b.getValue(), a.getValue()))
+                .limit(safeLimit)
+                .map(e -> mapToResponseDTO(e.getKey()))
+                .toList();
     }
 }

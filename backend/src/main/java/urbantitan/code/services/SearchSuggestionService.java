@@ -38,13 +38,19 @@ public class SearchSuggestionService {
             return List.of();
         }
 
-        // Fetch a small candidate pool from DB first (fast), then do fuzzy scoring in-memory.
-        int candidateLimitPerType = Math.max(50, limit * 20);
+        // Keep candidate pools bounded. Too large makes every request slow.
+        int candidateLimitPerType = Math.max(30, limit * 12);
+
+        // If LIKE-based candidate query returns almost nothing (common for typos), fall back.
+        int minCandidatesBeforeFallback = Math.max(8, limit * 2);
 
         List<SearchSuggestionDTO> out = new ArrayList<>();
 
         if (types.contains(SuggestType.product)) {
             List<Product> products = productRepository.findSearchCandidates(query.toLowerCase(Locale.ROOT), candidateLimitPerType);
+            if (products.size() < minCandidatesBeforeFallback) {
+                products = productRepository.findFallbackCandidates(Math.max(60, candidateLimitPerType * 2));
+            }
             for (Product p : products) {
                 double score = Math.max(
                         FuzzyScorer.score(query, p.getName()),
@@ -61,6 +67,9 @@ public class SearchSuggestionService {
 
         if (types.contains(SuggestType.category)) {
             List<Category> categories = categoryRepository.findSearchCandidates(query.toLowerCase(Locale.ROOT), candidateLimitPerType);
+            if (categories.size() < minCandidatesBeforeFallback) {
+                categories = categoryRepository.findFallbackCandidates(Math.max(80, candidateLimitPerType * 3));
+            }
             for (Category c : categories) {
                 double score = Math.max(
                         FuzzyScorer.score(query, c.getName()),
@@ -77,6 +86,9 @@ public class SearchSuggestionService {
 
         if (types.contains(SuggestType.brand)) {
             List<Brand> brands = brandRepository.findSearchCandidates(query.toLowerCase(Locale.ROOT), candidateLimitPerType);
+            if (brands.size() < minCandidatesBeforeFallback) {
+                brands = brandRepository.findFallbackCandidates(Math.max(80, candidateLimitPerType * 3));
+            }
             for (Brand b : brands) {
                 double score = Math.max(
                         FuzzyScorer.score(query, b.getName()),
@@ -91,12 +103,13 @@ public class SearchSuggestionService {
             }
         }
 
-        // Rank and return top N.
+        // Filter tiny scores so we don't return junk, then rank and return top N.
+        double minScore = 0.22;
         return out.stream()
+                .filter(s -> s.getScore() >= minScore)
                 .sorted(Comparator.comparingDouble(SearchSuggestionDTO::getScore).reversed()
                         .thenComparing(SearchSuggestionDTO::getLabel))
                 .limit(limit)
                 .toList();
     }
 }
-

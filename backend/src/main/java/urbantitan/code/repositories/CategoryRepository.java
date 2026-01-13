@@ -31,7 +31,14 @@ public interface CategoryRepository extends JpaRepository<Category, UUID> {
     @Query("SELECT c FROM Category c WHERE lower(c.name) LIKE concat('%', :q, '%') OR lower(c.slug) LIKE concat('%', :q, '%')")
     List<Category> findSearchCandidates(@Param("q") String q, Pageable pageable);
 
+    @Query("SELECT c FROM Category c")
+    List<Category> findFallbackCandidates(Pageable pageable);
+
     default List<Category> findSearchCandidates(String q, int limit) {
         return findSearchCandidates(q, org.springframework.data.domain.PageRequest.of(0, limit));
+    }
+
+    default List<Category> findFallbackCandidates(int limit) {
+        return findFallbackCandidates(org.springframework.data.domain.PageRequest.of(0, limit));
     }
 }

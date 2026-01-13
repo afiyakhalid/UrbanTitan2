@@ -25,7 +25,16 @@ public interface ProductRepository extends JpaRepository<Product, UUID> {
             "ORDER BY p.isActive DESC, p.createdAt DESC")
     List<Product> findSearchCandidates(@Param("q") String q, org.springframework.data.domain.Pageable pageable);
 
+    @Query("SELECT p FROM Product p " +
+            "WHERE (p.isActive = TRUE OR p.isActive IS NULL) " +
+            "ORDER BY p.isActive DESC, p.createdAt DESC")
+    List<Product> findFallbackCandidates(org.springframework.data.domain.Pageable pageable);
+
     default List<Product> findSearchCandidates(String q, int limit) {
         return findSearchCandidates(q, org.springframework.data.domain.PageRequest.of(0, limit));
+    }
+
+    default List<Product> findFallbackCandidates(int limit) {
+        return findFallbackCandidates(org.springframework.data.domain.PageRequest.of(0, limit));
     }
 }

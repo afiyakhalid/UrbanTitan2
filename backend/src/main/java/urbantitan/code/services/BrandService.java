@@ -7,6 +7,8 @@ import urbantitan.code.dto.brand.BrandRequestDTO;
 import urbantitan.code.dto.brand.BrandResponseDTO;
 import urbantitan.code.entities.Brand;
 import urbantitan.code.repositories.BrandRepository;
+import urbantitan.code.services.search.FuzzyScorer;
+
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -81,5 +83,37 @@ public class BrandService {
 
     public boolean existsBySlug(String slug) {
         return brandRepository.existsBySlug(slug);
+    }
+
+    public List<BrandResponseDTO> searchBrands(String q, int limit) {
+        String query = q == null ? "" : q.trim();
+        if (query.isEmpty()) {
+            return List.of();
+        }
+        int safeLimit = Math.max(1, Math.min(limit, 50));
+
+        int likeLimit = Math.max(50, safeLimit * 20);
+        int fallbackLimit = Math.max(200, safeLimit * 40);
+
+        List<Brand> candidates = brandRepository.findSearchCandidates(
+                query.toLowerCase(java.util.Locale.ROOT),
+                org.springframework.data.domain.PageRequest.of(0, likeLimit)
+        );
+        if (candidates.size() < Math.max(10, safeLimit * 3)) {
+            candidates = brandRepository.findFallbackCandidates(
+                    org.springframework.data.domain.PageRequest.of(0, fallbackLimit)
+            );
+        }
+
+        return candidates.stream()
+                .map(b -> new java.util.AbstractMap.SimpleEntry<>(b, Math.max(
+                        FuzzyScorer.score(query, b.getName()),
+                        FuzzyScorer.score(query, b.getSlug())
+                )))
+                .filter(e -> e.getValue() >= 0.20)
+                .sorted((a, b) -> Double.compare(b.getValue(), a.getValue()))
+                .limit(safeLimit)
+                .map(e -> modelMapper.map(e.getKey(), BrandResponseDTO.class))
+                .toList();
     }
 }

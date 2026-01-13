@@ -20,7 +20,14 @@ public interface BrandRepository extends JpaRepository<Brand, UUID> {
     @Query("SELECT b FROM Brand b WHERE lower(b.name) LIKE concat('%', :q, '%') OR lower(b.slug) LIKE concat('%', :q, '%')")
     List<Brand> findSearchCandidates(@Param("q") String q, Pageable pageable);
 
+    @Query("SELECT b FROM Brand b")
+    List<Brand> findFallbackCandidates(Pageable pageable);
+
     default List<Brand> findSearchCandidates(String q, int limit) {
         return findSearchCandidates(q, org.springframework.data.domain.PageRequest.of(0, limit));
+    }
+
+    default List<Brand> findFallbackCandidates(int limit) {
+        return findFallbackCandidates(org.springframework.data.domain.PageRequest.of(0, limit));
     }
 }

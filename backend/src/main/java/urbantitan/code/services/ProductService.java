@@ -110,4 +110,34 @@ public class ProductService {
         }
         productRepository.deleteById(id);
     }
+
+    public List<ProductResponseDTO> getProductsByCategorySlug(String categorySlug) {
+        Category category = categoryRepository.findBySlug(categorySlug)
+                .orElseThrow(() -> new IllegalArgumentException("Category not found with slug: " + categorySlug));
+        return getProductsByCategoryId(category.getId());
+    }
+
+    /**
+     * Searches products by substring match on name/slug (DB LIKE). This is the fallback
+     * when the query doesn't clearly map to a category.
+     */
+    public List<ProductResponseDTO> searchProducts(String q, int limit) {
+        String query = q == null ? "" : q.trim().toLowerCase(java.util.Locale.ROOT);
+        if (query.isEmpty()) {
+            return List.of();
+        }
+        List<Product> products = productRepository.findSearchCandidates(query, limit);
+        return products.stream()
+                .map(product -> productModelMapper.map(product, ProductResponseDTO.class))
+                .toList();
+    }
+
+    public List<ProductResponseDTO> getProductsByBrandSlug(String brandSlug) {
+        Brand brand = brandRepository.findBySlug(brandSlug)
+                .orElseThrow(() -> new IllegalArgumentException("Brand not found with slug: " + brandSlug));
+        List<Product> products = productRepository.findByBrandId(brand.getId());
+        return products.stream()
+                .map(product -> productModelMapper.map(product, ProductResponseDTO.class))
+                .toList();
+    }
 }
