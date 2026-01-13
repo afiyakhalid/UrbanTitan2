@@ -273,40 +273,54 @@ function MobileCategory() {
   );
 }
 
+// ...existing code...
 export function Header() {
   const { cart } = useCartStore();
   const { user, logout } = useAuthStore();
   const router = useRouter(); 
   const [searchQuery, setSearchQuery] = React.useState("");
   const [suggestions, setSuggestions] = React.useState<{ name: string; id: string; slug: string }[]>([]);
-  const [allSearchData, setAllSearchData] = React.useState<{ name: string; id: string; slug: string }[]>([]);
+  // REMOVED: allSearchData state is no longer needed
   const [showSuggestions, setShowSuggestions] = React.useState(false);
 
+  // CHANGED: Use effect handles debounced API call instead of fetching all products
   React.useEffect(() => {
-    fetchProducts().then((products) => {
-      const formatted = products.map((p) => ({
-        name: p.details.name,
-        id: p.id,
-        slug: p.details.productCode || p.id, 
-      }));
-      setAllSearchData(formatted);
-    });
-  }, []);
+    const delayDebounceFn = setTimeout(async () => {
+      if (searchQuery.trim().length >= 2) {
+        try {
+          const res = await fetch(
+            `${getApiBaseUrl()}/api/v1/search/suggest?q=${encodeURIComponent(
+              searchQuery
+            )}&limit=5&types=product`
+          );
+
+          if (res.ok) {
+            const data = await res.json();
+            // Map backend DTO to frontend format
+            const formatted = data.map((item: any) => ({
+              name: item.text || item.title || item.name, 
+              id: item.id,
+              slug: item.slug || String(item.id),
+            }));
+            setSuggestions(formatted);
+            setShowSuggestions(true);
+          }
+        } catch (error) {
+          console.error("Error fetching suggestions:", error);
+          setSuggestions([]);
+        }
+      } else {
+        setSuggestions([]);
+        setShowSuggestions(false);
+      }
+    }, 300); // Wait 300ms after typing stops
+
+    return () => clearTimeout(delayDebounceFn);
+  }, [searchQuery]);
 
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const query = e.target.value;
-    setSearchQuery(query);
-
-    if (query.length >= 2) {
-      const matches = allSearchData
-        .filter((item) => item.name.toLowerCase().includes(query.toLowerCase()))
-        .slice(0, 5);
-      setSuggestions(matches);
-      setShowSuggestions(true);
-    } else {
-      setSuggestions([]);
-      setShowSuggestions(false);
-    }
+    // Just update the query, let useEffect handle the fetching
+    setSearchQuery(e.target.value);
   };
 
   const handleSelectSuggestion = (id: string) => {
@@ -314,6 +328,7 @@ export function Header() {
     setShowSuggestions(false);
     setSearchQuery("");
   }
+// ...existing code...
 
   const handleSearch = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Enter" && searchQuery.trim()) {

@@ -5,7 +5,7 @@ import { SlidersHorizontal, X } from "lucide-react";
 import { FilterSection } from "@/components/filter/filter-section";
 import { Brand, type CategoryLink } from "@/lib/constants";
 import { type Product as ProductType } from "@/lib/types";
-import { fetchBrands, fetchCategories, fetchProducts } from "@/lib/catalog";
+import { fetchBrands, fetchCategories, fetchProducts, searchProducts } from "@/lib/catalog";
 import { ProductCard } from "@/components/product/product-card";
 import {
   useQueryState,
@@ -73,8 +73,10 @@ export function PageComponent() {
   React.useEffect(() => {
     let cancelled = false;
     (async () => {
+      const productReq = search ? searchProducts(search) : fetchProducts();
+
       const [products, cats, brandsList] = await Promise.all([
-        fetchProducts(),
+        productReq,
         fetchCategories(),
         fetchBrands(),
       ]);
@@ -86,7 +88,7 @@ export function PageComponent() {
     return () => {
       cancelled = true;
     };
-  }, []);
+  }, [search]);
 
   React.useEffect(() => {
     const source = allProducts.length > 0 ? allProducts : [];
@@ -105,18 +107,11 @@ export function PageComponent() {
       const meetsBrand =
         brands.length > 0 ? brands.includes(p.details.brand.slug) : true;
       
-      const param = search?.toLowerCase() || "";
-      const meetsSearch = 
-        !param || 
-        p.details.name.toLowerCase().includes(param) ||
-        p.details.brand.name.toLowerCase().includes(param) ||
-        p.details.category.name.toLowerCase().includes(param);
-
-      return inPriceRange && meetsDiscount && meetsCategory && meetsBrand && meetsSearch;
+      return inPriceRange && meetsDiscount && meetsCategory && meetsBrand;
     });
 
     setFilteredProducts(newProducts);
-  }, [allProducts, priceRange, discount, brands, categories, search]);
+  }, [allProducts, priceRange, discount, brands, categories]);
 
   return (
     <div className="w-full flex flex-col md:flex-row md:gap-6 max-w-8xl mx-auto px-12 py-8">

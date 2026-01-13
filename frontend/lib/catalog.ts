@@ -1,5 +1,6 @@
 import { apiFetch } from "@/lib/api";
 import { type Product as UiProduct } from "@/lib/types";
+
 import {
   allBrands,
   allCategories,
@@ -162,5 +163,15 @@ export async function fetchProductById(id: string): Promise<UiProduct | null> {
     return mapBackendProductToUi(data);
   } catch {
     return null;
+  }
+}
+
+export async function searchProducts(query: string): Promise<UiProduct[]> {
+  try {
+    const res = await apiFetch(`/api/v1/search?query=${encodeURIComponent(query)}`);
+    const data = (await res.json()) as BackendProduct[];
+    return data.map(mapBackendProductToUi);
+  } catch {
+    return [];
   }
 }
